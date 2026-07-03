@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: docker/php/Dockerfile
+    container_name: wms_backend
+    volumes:
+      - ./backend:/var/www/html
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./backend/.env
+
+  queue-worker:
+    build:
+      context: ./backend
+      dockerfile: docker/php/Dockerfile
+    container_name: wms_queue
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./backend/.env
+    command: php artisan queue:work
+
+  frontend:
+    image: node:20-alpine
+    container_name: wms_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: wms_postgres
+    environment:
+      POSTGRES_DB: wms_coffee
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: wms_redis
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  pg_data:
+  redis_data:
