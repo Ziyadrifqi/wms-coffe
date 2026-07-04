@@ -1,18 +1,23 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\MasterData\MaterialController;
+use App\Http\Controllers\Api\V1\MasterData\SupplierController;
+use App\Http\Controllers\Api\V1\MasterData\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    // Public routes
     Route::post('/login', [AuthController::class, 'login']);
 
-    // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
 
-        // Nanti route modul lain (master-data, procurement, dll) masuk sini
+        Route::prefix('master-data')->group(function () {
+            Route::apiResource('suppliers', SupplierController::class);
+            Route::apiResource('warehouses', WarehouseController::class);
+            Route::apiResource('materials', MaterialController::class);
+        });
     });
 });
