@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -17,7 +17,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (! $user || ! Auth::attempt($credentials)) {
+        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['Email atau password salah.'],
             ]);
@@ -28,9 +28,6 @@ class AuthController extends Controller
                 'email' => ['Akun Anda tidak aktif. Hubungi administrator.'],
             ]);
         }
-
-        // Hapus token lama (opsional, kalau mau single-session)
-        // $user->tokens()->delete();
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
