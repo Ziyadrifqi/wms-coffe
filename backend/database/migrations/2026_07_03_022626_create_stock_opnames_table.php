@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('stock_opnames', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('opname_number')->unique();
+            $table->foreignUuid('warehouse_id')->constrained('warehouses');
+            $table->foreignUuid('created_by')->constrained('users');
+            $table->date('opname_date');
+            $table->enum('status', ['draft', 'in_progress', 'completed'])->default('draft');
             $table->timestamps();
         });
     }

@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('production_requests', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('request_number')->unique();
+            $table->foreignUuid('warehouse_id')->constrained('warehouses');
+            $table->foreignUuid('requested_by')->constrained('users');
+            $table->foreignUuid('approved_by')->nullable()->constrained('users');
+            $table->enum('status', ['pending', 'approved', 'rejected', 'fulfilled'])->default('pending');
+            $table->date('request_date');
+            $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index('status');
         });
     }
 

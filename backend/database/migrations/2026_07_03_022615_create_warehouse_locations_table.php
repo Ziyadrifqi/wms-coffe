@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('warehouse_locations', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->foreignUuid('warehouse_id')->constrained('warehouses')->cascadeOnDelete();
+            $table->string('code');        // Rak-A1, Freezer-1
+            $table->string('name');
             $table->timestamps();
+
+            $table->index('warehouse_id');
         });
     }
 
