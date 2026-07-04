@@ -1,7 +1,8 @@
 import axiosClient from './axiosClient';
+import type { LoginPayload, LoginResponse } from '../types/auth';
 
-export const login = (email: string, password: string) => {
-  return axiosClient.post('/login', { email, password });
+export const login = (payload: LoginPayload) => {
+  return axiosClient.post<LoginResponse>('/login', payload);
 };
 
 export const logout = () => {
