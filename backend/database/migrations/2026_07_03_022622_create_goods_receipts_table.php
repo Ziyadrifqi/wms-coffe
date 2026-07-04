@@ -12,8 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('goods_receipts', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
+            $table->string('gr_number')->unique();
+            $table->foreignUuid('purchase_order_id')->constrained('purchase_orders');
+            $table->foreignUuid('warehouse_id')->constrained('warehouses');
+            $table->foreignUuid('received_by')->constrained('users');
+            $table->date('receipt_date');
+            $table->enum('status', ['draft', 'confirmed'])->default('draft');
+            $table->text('notes')->nullable();
             $table->timestamps();
+
+            $table->index('purchase_order_id');
         });
     }
 
