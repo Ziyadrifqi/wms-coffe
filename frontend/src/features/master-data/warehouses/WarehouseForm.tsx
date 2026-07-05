@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { warehouseApi } from '../../../api/masterData.api';
 import type { Warehouse } from '../../../types/masterData';
+import { getErrorMessage } from '../../../utils/getErrorMessage';
 
 const schema = z.object({
   code: z.string().min(1, 'Kode wajib diisi'),
@@ -44,10 +45,9 @@ export default function WarehouseForm({ warehouse, onSuccess }: Props) {
       toast.success(isEdit ? 'Warehouse berhasil diperbarui' : 'Warehouse berhasil ditambahkan');
       onSuccess();
     },
-    onError: (err: any) => {
-      const message = err.response?.data?.message ?? 'Terjadi kesalahan';
-      toast.error(message);
-    },
+    onError: (err: unknown) => {
+  toast.error(getErrorMessage(err));
+},
   });
 
   const onSubmit = (data: FormData) => mutation.mutate(data);

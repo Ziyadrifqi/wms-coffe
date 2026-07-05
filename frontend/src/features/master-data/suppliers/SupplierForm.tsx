@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { supplierApi } from '../../../api/masterData.api';
 import type { Supplier } from '../../../types/masterData';
+import { getErrorMessage } from '../../../utils/getErrorMessage';
 
 const schema = z.object({
   code: z.string().min(1, 'Kode wajib diisi'),
@@ -48,10 +49,9 @@ export default function SupplierForm({ supplier, onSuccess }: Props) {
       toast.success(isEdit ? 'Supplier berhasil diperbarui' : 'Supplier berhasil ditambahkan');
       onSuccess();
     },
-    onError: (err: any) => {
-      const message = err.response?.data?.message ?? 'Terjadi kesalahan';
-      toast.error(message);
-    },
+    onError: (err: unknown) => {
+  toast.error(getErrorMessage(err));
+},
   });
 
   const onSubmit = (data: FormData) => mutation.mutate(data);
