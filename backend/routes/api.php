@@ -6,7 +6,10 @@ use App\Http\Controllers\Api\V1\MasterData\SupplierController;
 use App\Http\Controllers\Api\V1\MasterData\WarehouseController;
 use App\Http\Controllers\Api\V1\MasterData\UnitController;
 use App\Http\Controllers\Api\V1\MasterData\CategoryController;
+use App\Http\Controllers\Api\V1\Procurement\GoodsReceiptController;
+use App\Http\Controllers\Api\V1\Procurement\PurchaseOrderController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::prefix('v1')->group(function () {
 
@@ -23,6 +26,15 @@ Route::prefix('v1')->group(function () {
 
             Route::get('categories', [CategoryController::class, 'index']);
             Route::get('units', [UnitController::class, 'index']);
+        });
+
+        Route::prefix('procurement')->group(function () {
+            Route::apiResource('purchase-orders', PurchaseOrderController::class)->except(['destroy']);
+            Route::post('purchase-orders/{purchaseOrder}/submit', [PurchaseOrderController::class, 'submit']);
+            Route::post('purchase-orders/{purchaseOrder}/approve', [PurchaseOrderController::class, 'approve']);
+            Route::post('purchase-orders/{purchaseOrder}/reject', [PurchaseOrderController::class, 'reject']);
+
+            Route::apiResource('goods-receipts', GoodsReceiptController::class)->only(['index', 'store', 'show']);
         });
     });
 });
