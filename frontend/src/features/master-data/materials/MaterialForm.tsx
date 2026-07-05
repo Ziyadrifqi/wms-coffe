@@ -5,6 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { materialApi, categoryApi, unitApi } from '../../../api/masterData.api';
 import type { Material, Category, Unit } from '../../../types/masterData';
+import { getErrorMessage } from '../../../utils/getErrorMessage';
 
 const schema = z.object({
   sku: z.string().min(1, 'SKU wajib diisi'),
@@ -63,10 +64,9 @@ export default function MaterialForm({ material, onSuccess }: Props) {
       toast.success(isEdit ? 'Material berhasil diperbarui' : 'Material berhasil ditambahkan');
       onSuccess();
     },
-    onError: (err: any) => {
-      const message = err.response?.data?.message ?? 'Terjadi kesalahan';
-      toast.error(message);
-    },
+    onError: (err: unknown) => {
+  toast.error(getErrorMessage(err));
+},
   });
 
   const onSubmit = (data: FormOutput) => mutation.mutate(data);
