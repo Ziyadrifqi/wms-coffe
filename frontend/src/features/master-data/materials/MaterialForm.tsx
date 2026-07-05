@@ -44,7 +44,7 @@ export default function MaterialForm({ material, onSuccess }: Props) {
     register,
     handleSubmit,
     formState: { errors },
-} = useForm<FormInput, any, FormOutput>({ 
+} = useForm<FormInput, unknown, FormOutput>({ 
     resolver: zodResolver(schema),
     defaultValues: {
       sku: material?.sku ?? '',
