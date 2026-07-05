@@ -1,15 +1,21 @@
-import { NavLink } from 'react-router-dom';
+import { useState } from 'react';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Warehouse,
-  Factory, FileBarChart, Settings, LogOut,
+  Factory, FileBarChart, Settings, LogOut, ChevronDown,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { logout as logoutApi } from '../../api/auth.api';
-import { useNavigate } from 'react-router-dom';
+
+const masterDataSubmenu = [
+  { label: 'Supplier', path: '/master-data/suppliers' },
+  { label: 'Warehouse', path: '/master-data/warehouses' },
+  { label: 'Material', path: '/master-data/materials' },
+];
 
 const menuItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'Master Data', path: '/master-data', icon: Package },
+  { label: 'Master Data', icon: Package, submenu: masterDataSubmenu },
   { label: 'Procurement', path: '/procurement', icon: ShoppingCart },
   { label: 'Inventory', path: '/inventory', icon: Warehouse },
   { label: 'Production', path: '/production', icon: Factory },
@@ -19,8 +25,11 @@ const menuItems = [
 
 export default function Sidebar() {
   const navigate = useNavigate();
+  const location = useLocation();
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const user = useAuthStore((state) => state.user);
+
+  const [openMenu, setOpenMenu] = useState<string | null>('Master Data');
 
   const handleLogout = async () => {
     try {
@@ -33,6 +42,10 @@ export default function Sidebar() {
     }
   };
 
+  const toggleSubmenu = (label: string) => {
+    setOpenMenu((prev) => (prev === label ? null : label));
+  };
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 flex flex-col h-screen sticky top-0">
       <div className="p-6 border-b border-gray-200">
@@ -41,22 +54,67 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {menuItems.map((item) => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
-                isActive
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`
-            }
-          >
-            <item.icon size={18} />
-            {item.label}
-          </NavLink>
-        ))}
+        {menuItems.map((item) => {
+          if (item.submenu) {
+            const isOpen = openMenu === item.label;
+            const isActiveGroup = item.submenu.some((sub) => location.pathname.startsWith(sub.path));
+
+            return (
+              <div key={item.label}>
+                <button
+                  onClick={() => toggleSubmenu(item.label)}
+                  className={`flex items-center justify-between w-full px-3 py-2 rounded-md text-sm font-medium transition ${
+                    isActiveGroup ? 'text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="flex items-center gap-3">
+                    <item.icon size={18} />
+                    {item.label}
+                  </span>
+                  <ChevronDown
+                    size={16}
+                    className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  />
+                </button>
+
+                {isOpen && (
+                  <div className="ml-9 mt-1 space-y-1">
+                    {item.submenu.map((sub) => (
+                      <NavLink
+                        key={sub.path}
+                        to={sub.path}
+                        className={({ isActive }) =>
+                          `block px-3 py-1.5 rounded-md text-sm transition ${
+                            isActive
+                              ? 'bg-blue-50 text-blue-600 font-medium'
+                              : 'text-gray-500 hover:bg-gray-50'
+                          }`
+                        }
+                      >
+                        {sub.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path!}
+              className={({ isActive }) =>
+                `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
+                  isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'
+                }`
+              }
+            >
+              <item.icon size={18} />
+              {item.label}
+            </NavLink>
+          );
+        })}
       </nav>
 
       <div className="p-3 border-t border-gray-200">
