@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../../api/auth.api';
 import { useAuthStore } from '../../stores/authStore';
+import { getErrorMessage } from '../../utils/getErrorMessage';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -24,9 +25,9 @@ export default function LoginPage() {
       const { user, token } = response.data.data;
       setAuth(user, token);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login gagal. Periksa email dan password Anda.');
-    } finally {
+    } catch (err: unknown) {
+  setError(getErrorMessage(err, 'Login gagal. Periksa email dan password Anda.'));
+} finally {
       setLoading(false);
     }
   };

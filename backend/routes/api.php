@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\MasterData\MaterialController;
 use App\Http\Controllers\Api\V1\MasterData\SupplierController;
 use App\Http\Controllers\Api\V1\MasterData\WarehouseController;
+use App\Http\Controllers\Api\V1\MasterData\UnitController;
+use App\Http\Controllers\Api\V1\MasterData\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -18,6 +20,9 @@ Route::prefix('v1')->group(function () {
             Route::apiResource('suppliers', SupplierController::class);
             Route::apiResource('warehouses', WarehouseController::class);
             Route::apiResource('materials', MaterialController::class);
+
+            Route::get('categories', [CategoryController::class, 'index']);
+            Route::get('units', [UnitController::class, 'index']);
         });
     });
 });
