@@ -49,5 +49,15 @@ class UserSeeder extends Seeder
             ]
         );
         $gudang->assignRole('gudang');
+
+        $produksi = User::firstOrCreate(
+            ['email' => 'produksi@wmscoffee.test'],
+            [
+                'name' => 'Staff Produksi',
+                'password' => Hash::make('password'),
+                'is_active' => true,
+            ]
+        );
+        $produksi->assignRole('produksi');
     }
 }

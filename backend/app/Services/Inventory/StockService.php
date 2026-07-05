@@ -97,10 +97,16 @@ class StockService
             $userId,
             $notes
         ) {
-            $totalAvailable = Stock::where('material_id', $materialId)
+            // Ambil & lock semua row stok material ini di warehouse ini
+            $stocks = Stock::where('material_id', $materialId)
                 ->where('warehouse_id', $warehouseId)
+                ->where('qty', '>', 0)
+                ->orderByRaw('expiry_date IS NULL, expiry_date ASC') // FEFO
                 ->lockForUpdate()
-                ->sum('qty');
+                ->get();
+
+            // Jumlahkan di PHP, bukan di query
+            $totalAvailable = $stocks->sum('qty');
 
             if ($totalAvailable < $qty) {
                 throw new \RuntimeException("Stok tidak mencukupi. Tersedia: {$totalAvailable}, dibutuhkan: {$qty}");
@@ -108,14 +114,6 @@ class StockService
 
             $qtyBefore = $totalAvailable;
             $remaining = $qty;
-
-            // Ambil stok dari batch yang paling lama expired dulu (FEFO: First Expired First Out)
-            $stocks = Stock::where('material_id', $materialId)
-                ->where('warehouse_id', $warehouseId)
-                ->where('qty', '>', 0)
-                ->orderByRaw('expiry_date IS NULL, expiry_date ASC')
-                ->lockForUpdate()
-                ->get();
 
             foreach ($stocks as $stock) {
                 if ($remaining <= 0) break;
@@ -133,7 +131,7 @@ class StockService
                 'type' => 'out',
                 'reference_type' => $referenceType,
                 'reference_id' => $referenceId,
-                'qty' => -$qty, // negatif untuk 'out'
+                'qty' => -$qty,
                 'qty_before' => $qtyBefore,
                 'qty_after' => $qtyAfter,
                 'created_by' => $userId,
