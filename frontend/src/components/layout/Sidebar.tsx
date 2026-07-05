@@ -13,10 +13,14 @@ const masterDataSubmenu = [
   { label: 'Material', path: '/master-data/materials' },
 ];
 
+const procurementSubmenu = [
+  { label: 'Purchase Order', path: '/procurement/purchase-orders' },
+];
+
 const menuItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Master Data', icon: Package, submenu: masterDataSubmenu },
-  { label: 'Procurement', path: '/procurement', icon: ShoppingCart },
+{ label: 'Procurement', icon: ShoppingCart, submenu: procurementSubmenu },
   { label: 'Inventory', path: '/inventory', icon: Warehouse },
   { label: 'Production', path: '/production', icon: Factory },
   { label: 'Reports', path: '/reports', icon: FileBarChart },
