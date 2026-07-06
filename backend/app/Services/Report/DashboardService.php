@@ -13,12 +13,13 @@ use Illuminate\Support\Facades\DB;
 class DashboardService
 {
     private const CACHE_TTL = 300; // 5 menit
+    private const CACHE_TAG = 'dashboard';
 
     public function getKpis(?string $warehouseId = null): array
     {
         $cacheKey = 'dashboard:kpis:' . ($warehouseId ?? 'all');
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($warehouseId) {
+        return Cache::tags([self::CACHE_TAG])->remember($cacheKey, self::CACHE_TTL, function () use ($warehouseId) {
             $totalMaterials = Material::where('is_active', true)->count();
 
             $lowStockCount = $this->getLowStockMaterials($warehouseId)->count();
@@ -61,7 +62,7 @@ class DashboardService
     {
         $cacheKey = "dashboard:stock-trend:{$days}:" . ($warehouseId ?? 'all');
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($days, $warehouseId) {
+        return Cache::tags([self::CACHE_TAG])->remember($cacheKey, self::CACHE_TTL, function () use ($days, $warehouseId) {
             $startDate = now()->subDays($days)->startOfDay();
 
             $movements = StockMovement::query()
@@ -96,7 +97,7 @@ class DashboardService
     {
         $cacheKey = 'dashboard:low-stock-list:' . ($warehouseId ?? 'all');
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($warehouseId) {
+        return Cache::tags([self::CACHE_TAG])->remember($cacheKey, self::CACHE_TTL, function () use ($warehouseId) {
             return Material::query()
                 ->where('is_active', true)
                 ->where('min_stock', '>', 0)
@@ -124,7 +125,7 @@ class DashboardService
     {
         $cacheKey = "dashboard:expiring:{$days}:" . ($warehouseId ?? 'all');
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($days, $warehouseId) {
+        return Cache::tags([self::CACHE_TAG])->remember($cacheKey, self::CACHE_TTL, function () use ($days, $warehouseId) {
             return Stock::query()
                 ->with('material', 'warehouse')
                 ->when($warehouseId, fn($q) => $q->where('warehouse_id', $warehouseId))
@@ -165,8 +166,6 @@ class DashboardService
 
     public static function clearCache(): void
     {
-        // Karena cache key sekarang termasuk warehouse_id, gunakan pattern-based flush
-        // Redis mendukung ini lewat cache tags, tapi untuk kesederhanaan, kita flush semua dashboard cache
-        Cache::flush(); // catatan: ini flush SEMUA cache aplikasi, lihat penjelasan di bawah
+        Cache::tags([self::CACHE_TAG])->flush();
     }
 }
