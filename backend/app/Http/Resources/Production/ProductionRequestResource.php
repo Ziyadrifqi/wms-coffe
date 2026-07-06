@@ -17,7 +17,7 @@ class ProductionRequestResource extends JsonResource
                 'name' => $this->warehouse?->name,
             ],
             'status' => $this->status,
-            'request_date' => $this->request_date,
+            'request_date' => $this->request_date?->format('Y-m-d'),
             'notes' => $this->notes,
             'requested_by' => $this->requester?->name,
             'approved_by' => $this->approver?->name,

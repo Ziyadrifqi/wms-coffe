@@ -20,9 +20,9 @@ const procurementSubmenu = [
 const menuItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Master Data', icon: Package, submenu: masterDataSubmenu },
-{ label: 'Procurement', icon: ShoppingCart, submenu: procurementSubmenu },
+  { label: 'Procurement', icon: ShoppingCart, submenu: procurementSubmenu },
   { label: 'Inventory', path: '/inventory', icon: Warehouse },
-  { label: 'Production', path: '/production', icon: Factory },
+  { label: 'Production', path: '/production/requests', icon: Factory },
   { label: 'Reports', path: '/reports', icon: FileBarChart },
   { label: 'Settings', path: '/settings', icon: Settings },
 ];

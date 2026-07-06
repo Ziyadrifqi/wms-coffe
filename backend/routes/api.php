@@ -39,7 +39,9 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('production')->group(function () {
-            Route::apiResource('requests', ProductionRequestController::class)->except(['destroy', 'update']);
+            Route::apiResource('requests', ProductionRequestController::class)
+                ->parameters(['requests' => 'production_request'])
+                ->except(['destroy', 'update']);
             Route::post('requests/{productionRequest}/approve', [ProductionRequestController::class, 'approve']);
             Route::post('requests/{productionRequest}/reject', [ProductionRequestController::class, 'reject']);
             Route::post('requests/{productionRequest}/fulfill', [ProductionRequestController::class, 'fulfill']);

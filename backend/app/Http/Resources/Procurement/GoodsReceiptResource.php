@@ -21,7 +21,7 @@ class GoodsReceiptResource extends JsonResource
                 'name' => $this->warehouse?->name,
             ],
             'received_by' => $this->receiver?->name,
-            'receipt_date' => $this->receipt_date,
+            'receipt_date' => $this->receipt_date?->format('Y-m-d'),
             'status' => $this->status,
             'notes' => $this->notes,
             'items' => $this->whenLoaded('items', function () {

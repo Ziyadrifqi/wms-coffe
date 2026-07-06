@@ -8,7 +8,9 @@ import PurchaseOrderPage from '../features/procurement/purchase-orders/PurchaseO
 import PurchaseOrderFormPage from '../features/procurement/purchase-orders/PurchaseOrderFormPage';
 import PurchaseOrderDetailPage from '../features/procurement/purchase-orders/PurchaseOrderDetailPage';
 import GoodsReceiptFormPage from '../features/procurement/goods-receipts/GoodsReceiptFormPage';
-
+import ProductionRequestPage from '../features/production/ProductionRequestPage';
+import ProductionRequestFormPage from '../features/production/ProductionRequestFormPage';
+import ProductionRequestDetailPage from '../features/production/ProductionRequestDetailPage';
 import MaterialPage from '../features/master-data/materials/MaterialPage';
 import PrivateRoute from './PrivateRoute';
 
@@ -29,6 +31,10 @@ export default function AppRouter() {
             <Route path="/procurement/purchase-orders/new" element={<PurchaseOrderFormPage />} />
             <Route path="/procurement/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
             <Route path="/procurement/goods-receipts/new" element={<GoodsReceiptFormPage />} />
+         
+            <Route path="/production/requests" element={<ProductionRequestPage />} />
+            <Route path="/production/requests/new" element={<ProductionRequestFormPage />} />
+            <Route path="/production/requests/:id" element={<ProductionRequestDetailPage />} />
           </Route>
         </Route>
 
