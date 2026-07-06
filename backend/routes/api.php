@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Procurement\GoodsReceiptController;
 use App\Http\Controllers\Api\V1\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Api\V1\Production\ProductionRequestController;
 use App\Http\Controllers\Api\V1\Inventory\StockOpnameController;
+use App\Http\Controllers\Api\V1\Report\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -55,6 +56,14 @@ Route::prefix('v1')->group(function () {
 
             Route::put('stock-opnames/{stockOpname}/items', [StockOpnameController::class, 'updateItems']);
             Route::post('stock-opnames/{stockOpname}/complete', [StockOpnameController::class, 'complete']);
+        });
+
+        Route::prefix('dashboard')->group(function () {
+            Route::get('kpis', [DashboardController::class, 'kpis']);
+            Route::get('stock-trend', [DashboardController::class, 'stockTrend']);
+            Route::get('low-stock', [DashboardController::class, 'lowStock']);
+            Route::get('expiring-stock', [DashboardController::class, 'expiringStock']);
+            Route::get('recent-activity', [DashboardController::class, 'recentActivity']);
         });
     });
 });

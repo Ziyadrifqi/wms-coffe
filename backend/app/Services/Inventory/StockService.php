@@ -4,13 +4,11 @@ namespace App\Services\Inventory;
 
 use App\Models\Stock;
 use App\Models\StockMovement;
+use App\Services\Report\DashboardService;
 use Illuminate\Support\Facades\DB;
 
 class StockService
 {
-    /**
-     * Tambah stok (stock in) — dipakai saat Goods Receipt.
-     */
     public function addStock(
         string $materialId,
         string $warehouseId,
@@ -35,7 +33,6 @@ class StockService
             $batchNumber,
             $notes
         ) {
-            // Lock row supaya aman dari race condition (dua goods receipt bersamaan)
             $stock = Stock::where('material_id', $materialId)
                 ->where('warehouse_id', $warehouseId)
                 ->where('warehouse_location_id', $warehouseLocationId)
@@ -60,7 +57,7 @@ class StockService
 
             $qtyAfter = $qtyBefore + $qty;
 
-            return StockMovement::create([
+            $movement = StockMovement::create([
                 'material_id' => $materialId,
                 'warehouse_id' => $warehouseId,
                 'type' => 'in',
@@ -72,13 +69,12 @@ class StockService
                 'created_by' => $userId,
                 'notes' => $notes,
             ]);
+            DashboardService::clearCache();
+
+            return $movement;
         });
     }
 
-    /**
-     * Kurangi stok (stock out) — dipakai saat Production Request.
-     * Melempar exception kalau stok tidak cukup.
-     */
     public function removeStock(
         string $materialId,
         string $warehouseId,
@@ -97,15 +93,13 @@ class StockService
             $userId,
             $notes
         ) {
-            // Ambil & lock semua row stok material ini di warehouse ini
             $stocks = Stock::where('material_id', $materialId)
                 ->where('warehouse_id', $warehouseId)
                 ->where('qty', '>', 0)
-                ->orderByRaw('expiry_date IS NULL, expiry_date ASC') // FEFO
+                ->orderByRaw('expiry_date IS NULL, expiry_date ASC')
                 ->lockForUpdate()
                 ->get();
 
-            // Jumlahkan di PHP, bukan di query
             $totalAvailable = $stocks->sum('qty');
 
             if ($totalAvailable < $qty) {
@@ -125,7 +119,7 @@ class StockService
 
             $qtyAfter = $qtyBefore - $qty;
 
-            return StockMovement::create([
+            $movement = StockMovement::create([
                 'material_id' => $materialId,
                 'warehouse_id' => $warehouseId,
                 'type' => 'out',
@@ -137,17 +131,17 @@ class StockService
                 'created_by' => $userId,
                 'notes' => $notes,
             ]);
+
+            DashboardService::clearCache();
+
+            return $movement;
         });
     }
 
-    /**
-     * Sesuaikan stok berdasarkan selisih hasil stock opname.
-     * Bisa positif (stok fisik lebih banyak) atau negatif (stok fisik lebih sedikit).
-     */
     public function adjustStock(
         string $materialId,
         string $warehouseId,
-        float $difference, // qty_actual - qty_system, bisa + atau -
+        float $difference,
         string $referenceType,
         string $referenceId,
         string $userId,
@@ -170,8 +164,7 @@ class StockService
             $qtyBefore = $stocks->sum('qty');
 
             if ($difference == 0) {
-                // Tidak ada perubahan, tetap catat movement untuk audit trail
-                return StockMovement::create([
+                $movement = StockMovement::create([
                     'material_id' => $materialId,
                     'warehouse_id' => $warehouseId,
                     'type' => 'adjustment',
@@ -183,10 +176,13 @@ class StockService
                     'created_by' => $userId,
                     'notes' => $notes,
                 ]);
+
+                DashboardService::clearCache();
+
+                return $movement;
             }
 
             if ($difference > 0) {
-                // Stok fisik lebih banyak -> tambahkan ke baris stok pertama (atau buat baru kalau belum ada)
                 $stock = $stocks->first();
 
                 if ($stock) {
@@ -199,7 +195,6 @@ class StockService
                     ]);
                 }
             } else {
-                // Stok fisik lebih sedikit -> kurangi, mulai dari batch yang paling lama expired
                 $remaining = abs($difference);
 
                 $sortedStocks = $stocks->sortBy(function ($stock) {
@@ -217,7 +212,7 @@ class StockService
 
             $qtyAfter = $qtyBefore + $difference;
 
-            return StockMovement::create([
+            $movement = StockMovement::create([
                 'material_id' => $materialId,
                 'warehouse_id' => $warehouseId,
                 'type' => 'adjustment',
@@ -229,6 +224,10 @@ class StockService
                 'created_by' => $userId,
                 'notes' => $notes,
             ]);
+
+            DashboardService::clearCache();
+
+            return $movement;
         });
     }
 
