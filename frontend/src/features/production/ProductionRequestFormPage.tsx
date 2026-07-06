@@ -71,7 +71,7 @@ export default function ProductionRequestFormPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Buat Production Request</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Gudang</label>
             <select
@@ -120,7 +120,7 @@ export default function ProductionRequestFormPage() {
 
           <div className="space-y-3">
             {fields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 items-start bg-gray-50 p-3 rounded-md">
+<div key={field.id} className="flex flex-col sm:flex-row gap-2 sm:items-start bg-gray-50 p-3 rounded-md">
                 <div className="flex-1">
                   <select
                     {...register(`items.${index}.material_id`)}
@@ -136,7 +136,7 @@ export default function ProductionRequestFormPage() {
                   )}
                 </div>
 
-                <div className="w-32">
+               <div className="w-full sm:w-32">
                   <input
                     type="number"
                     step="0.01"

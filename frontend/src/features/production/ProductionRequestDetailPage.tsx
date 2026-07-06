@@ -77,8 +77,8 @@ export default function ProductionRequestDetailPage() {
         <ArrowLeft size={16} /> Kembali
       </button>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
           <div>
             <h1 className="text-xl font-bold text-gray-900">{data.request_number}</h1>
             <div className="mt-1"><StatusBadge status={data.status} /></div>
@@ -89,14 +89,14 @@ export default function ProductionRequestDetailPage() {
               <button
                 onClick={() => approveMutation.mutate()}
                 disabled={approveMutation.isPending}
-                className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+                className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
               >
                 Setujui
               </button>
               <button
                 onClick={() => rejectMutation.mutate()}
                 disabled={rejectMutation.isPending}
-                className="bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
+                className="flex-1 sm:flex-none bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-700"
               >
                 Tolak
               </button>
@@ -104,7 +104,7 @@ export default function ProductionRequestDetailPage() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
           <div>
             <span className="text-gray-500">Gudang</span>
             <p className="font-medium text-gray-900">{data.warehouse.name}</p>
@@ -125,47 +125,49 @@ export default function ProductionRequestDetailPage() {
           )}
         </div>
 
-        <table className="w-full text-sm mb-4">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="text-left px-3 py-2">Material</th>
-              <th className="text-right px-3 py-2">Qty Diminta</th>
-              <th className="text-right px-3 py-2">Qty Dikeluarkan</th>
-              {canFulfill && <th className="text-right px-3 py-2">Keluarkan Sekarang</th>}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {data.items.map((item) => {
-              const remaining = item.qty_requested - item.qty_fulfilled;
-              return (
-                <tr key={item.id}>
-                  <td className="px-3 py-2">{item.material.name}</td>
-                  <td className="px-3 py-2 text-right">{item.qty_requested}</td>
-                  <td className="px-3 py-2 text-right">{item.qty_fulfilled}</td>
-                  {canFulfill && (
-                    <td className="px-3 py-2 text-right">
-                      {remaining > 0 ? (
-                        <input
-                          type="number"
-                          step="0.01"
-                          max={remaining}
-                          placeholder={`Maks ${remaining}`}
-                          value={fulfillQty[item.id] ?? ''}
-                          onChange={(e) =>
-                            setFulfillQty((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))
-                          }
-                          className="w-28 px-2 py-1 border border-gray-300 rounded-md text-sm text-right"
-                        />
-                      ) : (
-                        <span className="text-gray-400 text-xs">Selesai</span>
-                      )}
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto mb-4 -mx-4 px-4 sm:-mx-6 sm:px-6">
+          <table className="w-full text-sm min-w-[600px]">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-3 py-2">Material</th>
+                <th className="text-right px-3 py-2">Qty Diminta</th>
+                <th className="text-right px-3 py-2">Qty Dikeluarkan</th>
+                {canFulfill && <th className="text-right px-3 py-2">Keluarkan Sekarang</th>}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {data.items.map((item) => {
+                const remaining = item.qty_requested - item.qty_fulfilled;
+                return (
+                  <tr key={item.id}>
+                    <td className="px-3 py-2 whitespace-nowrap">{item.material.name}</td>
+                    <td className="px-3 py-2 text-right whitespace-nowrap">{item.qty_requested}</td>
+                    <td className="px-3 py-2 text-right whitespace-nowrap">{item.qty_fulfilled}</td>
+                    {canFulfill && (
+                      <td className="px-3 py-2 text-right whitespace-nowrap">
+                        {remaining > 0 ? (
+                          <input
+                            type="number"
+                            step="0.01"
+                            max={remaining}
+                            placeholder={`Maks ${remaining}`}
+                            value={fulfillQty[item.id] ?? ''}
+                            onChange={(e) =>
+                              setFulfillQty((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))
+                            }
+                            className="w-28 px-2 py-1 border border-gray-300 rounded-md text-sm text-right"
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-xs">Selesai</span>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
 
         {data.notes && (
           <div className="text-sm text-gray-600 mb-4">
@@ -177,7 +179,7 @@ export default function ProductionRequestDetailPage() {
           <button
             onClick={() => fulfillMutation.mutate()}
             disabled={fulfillMutation.isPending || Object.values(fulfillQty).every((q) => !q)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
           >
             {fulfillMutation.isPending ? 'Memproses...' : 'Keluarkan Bahan'}
           </button>

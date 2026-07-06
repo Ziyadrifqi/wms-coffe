@@ -88,7 +88,7 @@ export default function PurchaseOrderFormPage() {
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Buat Purchase Order</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
+       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
             <select
@@ -160,7 +160,7 @@ export default function PurchaseOrderFormPage() {
 
           <div className="space-y-3">
             {fields.map((field, index) => (
-              <div key={field.id} className="flex gap-2 items-start bg-gray-50 p-3 rounded-md">
+            <div key={field.id} className="flex flex-col sm:flex-row gap-2 sm:items-start bg-gray-50 p-3 rounded-md">
                 <div className="flex-1">
                   <select
                     {...register(`items.${index}.material_id`)}
@@ -176,7 +176,7 @@ export default function PurchaseOrderFormPage() {
                   )}
                 </div>
 
-                <div className="w-28">
+                <div className="w-full sm:w-28">
                   <input
                     type="number"
                     step="0.01"
@@ -186,7 +186,7 @@ export default function PurchaseOrderFormPage() {
                   />
                 </div>
 
-                <div className="w-36">
+                <div className="w-full sm:w-36">
                   <input
                     type="number"
                     step="1"

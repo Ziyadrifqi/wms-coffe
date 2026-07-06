@@ -12,11 +12,13 @@ import ProductionRequestPage from '../features/production/ProductionRequestPage'
 import ProductionRequestFormPage from '../features/production/ProductionRequestFormPage';
 import ProductionRequestDetailPage from '../features/production/ProductionRequestDetailPage';
 import MaterialPage from '../features/master-data/materials/MaterialPage';
+import PageTitleUpdater from '../components/common/PageTitleUpdater';
 import PrivateRoute from './PrivateRoute';
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
+    <PageTitleUpdater />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
 
