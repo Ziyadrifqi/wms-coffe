@@ -1,4 +1,4 @@
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -47,12 +47,11 @@ export default function PurchaseOrderFormPage() {
   });
 
   const {
-    register,
-    control,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<FormInput, unknown, FormOutput>({
+  register,
+  control,
+  handleSubmit,
+  formState: { errors },
+} = useForm<FormInput, unknown, FormOutput>({
     resolver: zodResolver(schema),
     defaultValues: {
       supplier_id: '',
@@ -66,7 +65,7 @@ export default function PurchaseOrderFormPage() {
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
 
-  const watchItems = watch('items');
+ const watchItems = useWatch({ control, name: 'items' });
   const grandTotal = watchItems?.reduce(
     (sum, item) => sum + (Number(item.qty_ordered) || 0) * (Number(item.unit_price) || 0),
     0

@@ -13,6 +13,9 @@ import ProductionRequestFormPage from '../features/production/ProductionRequestF
 import ProductionRequestDetailPage from '../features/production/ProductionRequestDetailPage';
 import MaterialPage from '../features/master-data/materials/MaterialPage';
 import PageTitleUpdater from '../components/common/PageTitleUpdater';
+import StockOpnamePage from '../features/inventory/stock-opname/StockOpnamePage';
+import StockOpnameFormPage from '../features/inventory/stock-opname/StockOpnameFormPage';
+import StockOpnameDetailPage from '../features/inventory/stock-opname/StockOpnameDetailPage';
 import PrivateRoute from './PrivateRoute';
 
 export default function AppRouter() {
@@ -37,6 +40,10 @@ export default function AppRouter() {
             <Route path="/production/requests" element={<ProductionRequestPage />} />
             <Route path="/production/requests/new" element={<ProductionRequestFormPage />} />
             <Route path="/production/requests/:id" element={<ProductionRequestDetailPage />} />
+
+            <Route path="/inventory/stock-opnames" element={<StockOpnamePage />} />
+            <Route path="/inventory/stock-opnames/new" element={<StockOpnameFormPage />} />
+            <Route path="/inventory/stock-opnames/:id" element={<StockOpnameDetailPage />} />
           </Route>
         </Route>
 
