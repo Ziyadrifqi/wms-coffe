@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\MasterData\CategoryController;
 use App\Http\Controllers\Api\V1\Procurement\GoodsReceiptController;
 use App\Http\Controllers\Api\V1\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Api\V1\Production\ProductionRequestController;
+use App\Http\Controllers\Api\V1\Inventory\StockOpnameController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -45,6 +46,15 @@ Route::prefix('v1')->group(function () {
             Route::post('requests/{productionRequest}/approve', [ProductionRequestController::class, 'approve']);
             Route::post('requests/{productionRequest}/reject', [ProductionRequestController::class, 'reject']);
             Route::post('requests/{productionRequest}/fulfill', [ProductionRequestController::class, 'fulfill']);
+        });
+
+        Route::prefix('inventory')->group(function () {
+            Route::apiResource('stock-opnames', StockOpnameController::class)
+                ->parameters(['stock-opnames' => 'stock_opname'])
+                ->except(['destroy', 'update']);
+
+            Route::put('stock-opnames/{stockOpname}/items', [StockOpnameController::class, 'updateItems']);
+            Route::post('stock-opnames/{stockOpname}/complete', [StockOpnameController::class, 'complete']);
         });
     });
 });
