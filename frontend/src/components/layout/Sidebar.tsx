@@ -17,6 +17,11 @@ const procurementSubmenu = [
   { label: 'Purchase Order', path: '/procurement/purchase-orders' },
 ];
 
+const settingsSubmenu = [
+  { label: 'Manajemen User', path: '/settings/users' },
+  { label: 'Ganti Password', path: '/profile/change-password' },
+];
+
 const menuItems = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
   { label: 'Master Data', icon: Package, submenu: masterDataSubmenu },
@@ -24,7 +29,7 @@ const menuItems = [
   { label: 'Inventory', path: '/inventory/stock-opnames', icon: Warehouse },
   { label: 'Production', path: '/production/requests', icon: Factory },
   { label: 'Reports', path: '/reports', icon: FileBarChart },
-  { label: 'Settings', path: '/settings', icon: Settings },
+  { label: 'Settings', icon: Settings, submenu: settingsSubmenu },
 ];
 
 interface SidebarProps {

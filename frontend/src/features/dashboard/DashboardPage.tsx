@@ -9,6 +9,9 @@ import LowStockList from './components/LowStockList';
 import ExpiringStockList from './components/ExpiringStockList';
 import ActivityFeed from './components/ActivityFeed';
 import type { Warehouse } from '../../types/masterData';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../../stores/authStore';
+import { AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
   const [warehouseId, setWarehouseId] = useState<string>('');
@@ -23,11 +26,27 @@ export default function DashboardPage() {
     queryFn: () => dashboardApi.getKpis(warehouseId || undefined).then((res) => res.data.data),
   });
 
+  const user = useAuthStore((state) => state.user);
+const navigate = useNavigate();
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-
+{user?.must_change_password && (
+  <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md p-4 mb-6 flex items-center justify-between gap-3">
+    <div className="flex items-center gap-2">
+      <AlertCircle size={18} />
+      Anda masih menggunakan password sementara. Segera ganti demi keamanan akun Anda.
+    </div>
+    <button
+      onClick={() => navigate('/profile/change-password')}
+      className="bg-yellow-600 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-yellow-700 whitespace-nowrap"
+    >
+      Ganti Sekarang
+    </button>
+  </div>
+)}
         <select
           value={warehouseId}
           onChange={(e) => setWarehouseId(e.target.value)}

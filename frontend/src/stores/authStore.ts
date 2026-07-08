@@ -7,6 +7,7 @@ interface User {
   email: string;
   roles: string[];
   permissions: string[];
+  must_change_password: boolean;
 }
 
 interface AuthState {

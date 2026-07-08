@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\User\ChangePasswordRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -17,7 +19,7 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
-        if (! $user || ! Hash::check($credentials['password'], $user->password)) {
+        if (! $user || ! Auth::attempt($credentials)) {
             throw ValidationException::withMessages([
                 'email' => ['Email atau password salah.'],
             ]);
@@ -40,6 +42,7 @@ class AuthController extends Controller
                     'email' => $user->email,
                     'roles' => $user->getRoleNames(),
                     'permissions' => $user->getAllPermissions()->pluck('name'),
+                    'must_change_password' => $user->must_change_password,
                 ],
                 'token' => $token,
             ],
@@ -50,9 +53,7 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json([
-            'message' => 'Logout berhasil',
-        ]);
+        return response()->json(['message' => 'Logout berhasil']);
     }
 
     public function me(Request $request)
@@ -66,7 +67,26 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
+                'must_change_password' => $user->must_change_password,
             ],
         ]);
+    }
+
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $user = $request->user();
+
+        if (! Hash::check($request->current_password, $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => ['Password saat ini tidak sesuai.'],
+            ]);
+        }
+
+        $user->update([
+            'password' => $request->new_password,
+            'must_change_password' => false,
+        ]);
+
+        return response()->json(['message' => 'Password berhasil diperbarui']);
     }
 }

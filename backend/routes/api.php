@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\User\UserManagementController;
 use App\Http\Controllers\Api\V1\MasterData\MaterialController;
 use App\Http\Controllers\Api\V1\MasterData\SupplierController;
 use App\Http\Controllers\Api\V1\MasterData\WarehouseController;
@@ -21,6 +22,15 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
+
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
+
+        Route::prefix('settings')->group(function () {
+            Route::get('roles', [UserManagementController::class, 'roles']);
+            Route::apiResource('users', UserManagementController::class)
+                ->parameters(['users' => 'user'])
+                ->except(['destroy']);
+        });
 
         Route::prefix('master-data')->group(function () {
             Route::apiResource('suppliers', SupplierController::class);

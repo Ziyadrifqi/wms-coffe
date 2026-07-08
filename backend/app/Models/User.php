@@ -54,13 +54,12 @@ class User extends Authenticatable
 {
     use HasUuid, HasApiTokens, HasRoles, Notifiable, SoftDeletes;
 
-    protected $fillable = ['name', 'email', 'password', 'is_active'];
-
-    protected $hidden = ['password', 'remember_token'];
+    protected $fillable = ['name', 'email', 'password', 'is_active', 'must_change_password'];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
         'is_active' => 'boolean',
+        'must_change_password' => 'boolean',
         'password' => 'hashed',
     ];
 }
