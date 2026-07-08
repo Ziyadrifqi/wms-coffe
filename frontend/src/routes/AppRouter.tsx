@@ -16,7 +16,7 @@ import StockOpnamePage from '../features/inventory/stock-opname/StockOpnamePage'
 import StockOpnameFormPage from '../features/inventory/stock-opname/StockOpnameFormPage';
 import StockOpnameDetailPage from '../features/inventory/stock-opname/StockOpnameDetailPage';
 import UserPage from '../features/settings/users/UserPage';
-import ChangePasswordPage from '../features/profile/ChangePasswordPage';
+import ProfilePage from '../features/profile/ProfilePage';
 import PrivateRoute from './PrivateRoute';
 import PageTitleUpdater from '../components/common/PageTitleUpdater';
 
@@ -45,7 +45,7 @@ export default function AppRouter() {
             <Route path="/inventory/stock-opnames/new" element={<StockOpnameFormPage />} />
             <Route path="/inventory/stock-opnames/:id" element={<StockOpnameDetailPage />} />
             <Route path="/settings/users" element={<UserPage />} />
-            <Route path="/profile/change-password" element={<ChangePasswordPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
 

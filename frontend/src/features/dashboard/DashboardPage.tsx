@@ -40,7 +40,7 @@ const navigate = useNavigate();
       Anda masih menggunakan password sementara. Segera ganti demi keamanan akun Anda.
     </div>
     <button
-      onClick={() => navigate('/profile/change-password')}
+      onClick={() => navigate('/profile')}
       className="bg-yellow-600 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-yellow-700 whitespace-nowrap"
     >
       Ganti Sekarang

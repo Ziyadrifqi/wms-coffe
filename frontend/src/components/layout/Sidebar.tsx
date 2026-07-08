@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { logout as logoutApi } from '../../api/auth.api';
+import Modal from '../common/Modal';
 
 const masterDataSubmenu = [
   { label: 'Supplier', path: '/master-data/suppliers' },
@@ -19,7 +20,6 @@ const procurementSubmenu = [
 
 const settingsSubmenu = [
   { label: 'Manajemen User', path: '/settings/users' },
-  { label: 'Ganti Password', path: '/profile/change-password' },
 ];
 
 const menuItems = [
@@ -44,8 +44,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const user = useAuthStore((state) => state.user);
 
   const [openMenu, setOpenMenu] = useState<string | null>('Master Data');
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
     try {
       await logoutApi();
     } catch {
@@ -61,13 +64,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   };
 
   const handleNavClick = () => {
-    // tutup sidebar otomatis di mobile setelah pilih menu
     if (window.innerWidth < 768) onClose();
+  };
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+    handleNavClick();
   };
 
   return (
     <>
-      {/* Overlay gelap di belakang sidebar saat mobile menu terbuka */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 md:hidden"
@@ -85,7 +91,12 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold text-gray-900">WMS Coffee</h1>
-            <p className="text-xs text-gray-500 mt-1">{user?.name}</p>
+            <button
+              onClick={handleProfileClick}
+              className="text-xs text-gray-500 mt-1 hover:text-blue-600 hover:underline transition text-left"
+            >
+              {user?.name}
+            </button>
           </div>
           <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-600">
             <X size={20} />
@@ -160,7 +171,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         <div className="p-3 border-t border-gray-200">
           <button
-            onClick={handleLogout}
+            onClick={() => setIsLogoutModalOpen(true)}
             className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 w-full transition"
           >
             <LogOut size={18} />
@@ -168,6 +179,31 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           </button>
         </div>
       </aside>
+
+      <Modal
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        title="Konfirmasi Keluar"
+      >
+        <p className="text-sm text-gray-600 mb-6">
+          Apakah Anda yakin ingin keluar dari akun ini?
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setIsLogoutModalOpen(false)}
+            className="flex-1 border border-gray-300 py-2 rounded-md text-sm font-medium hover:bg-gray-50"
+          >
+            Batal
+          </button>
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="flex-1 bg-red-600 text-white py-2 rounded-md text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+          >
+            {isLoggingOut ? 'Memproses...' : 'Ya, Keluar'}
+          </button>
+        </div>
+      </Modal>
     </>
   );
 }

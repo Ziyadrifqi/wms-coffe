@@ -7,6 +7,15 @@ interface ChangePasswordPayload {
   new_password_confirmation: string;
 }
 
+interface UpdateProfilePayload {
+  name: string;
+  email: string;
+}
+
+export const updateProfile = (payload: UpdateProfilePayload) => {
+  return axiosClient.put('/profile', payload);
+};
+
 export const changePassword = (payload: ChangePasswordPayload) => {
   return axiosClient.post('/change-password', payload);
 };

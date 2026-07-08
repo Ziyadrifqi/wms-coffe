@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
                 ->parameters(['users' => 'user'])
                 ->except(['destroy']);
         });
+        Route::put('/profile', [AuthController::class, 'updateProfile']);
 
         Route::prefix('master-data')->group(function () {
             Route::apiResource('suppliers', SupplierController::class);
