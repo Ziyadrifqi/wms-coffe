@@ -17,6 +17,7 @@ import StockOpnameFormPage from '../features/inventory/stock-opname/StockOpnameF
 import StockOpnameDetailPage from '../features/inventory/stock-opname/StockOpnameDetailPage';
 import UserPage from '../features/settings/users/UserPage';
 import ProfilePage from '../features/profile/ProfilePage';
+import ReportsPage from '../features/reports/ReportsPage';
 import PrivateRoute from './PrivateRoute';
 import PageTitleUpdater from '../components/common/PageTitleUpdater';
 
@@ -29,21 +30,27 @@ export default function AppRouter() {
 
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
-            {/* SEMUA route yang butuh sidebar HARUS ada di dalam sini */}
             <Route path="/dashboard" element={<DashboardPage />} />
+
             <Route path="/master-data/suppliers" element={<SupplierPage />} />
             <Route path="/master-data/warehouses" element={<WarehousePage />} />
             <Route path="/master-data/materials" element={<MaterialPage />} />
+
             <Route path="/procurement/purchase-orders" element={<PurchaseOrderPage />} />
             <Route path="/procurement/purchase-orders/new" element={<PurchaseOrderFormPage />} />
             <Route path="/procurement/purchase-orders/:id" element={<PurchaseOrderDetailPage />} />
             <Route path="/procurement/goods-receipts/new" element={<GoodsReceiptFormPage />} />
+
             <Route path="/production/requests" element={<ProductionRequestPage />} />
             <Route path="/production/requests/new" element={<ProductionRequestFormPage />} />
             <Route path="/production/requests/:id" element={<ProductionRequestDetailPage />} />
+
             <Route path="/inventory/stock-opnames" element={<StockOpnamePage />} />
             <Route path="/inventory/stock-opnames/new" element={<StockOpnameFormPage />} />
             <Route path="/inventory/stock-opnames/:id" element={<StockOpnameDetailPage />} />
+
+            <Route path="/reports" element={<ReportsPage />} />
+
             <Route path="/settings/users" element={<UserPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>

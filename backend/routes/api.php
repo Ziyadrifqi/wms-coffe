@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\Procurement\PurchaseOrderController;
 use App\Http\Controllers\Api\V1\Production\ProductionRequestController;
 use App\Http\Controllers\Api\V1\Inventory\StockOpnameController;
 use App\Http\Controllers\Api\V1\Report\DashboardController;
+use App\Http\Controllers\Api\V1\Report\StockMovementReportController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -75,6 +76,12 @@ Route::prefix('v1')->group(function () {
             Route::get('low-stock', [DashboardController::class, 'lowStock']);
             Route::get('expiring-stock', [DashboardController::class, 'expiringStock']);
             Route::get('recent-activity', [DashboardController::class, 'recentActivity']);
+        });
+
+        Route::prefix('reports')->group(function () {
+            Route::get('stock-movements', [StockMovementReportController::class, 'index']);
+            Route::get('stock-movements/export-excel', [StockMovementReportController::class, 'exportExcel']);
+            Route::get('stock-movements/export-pdf', [StockMovementReportController::class, 'exportPdf']);
         });
     });
 });
