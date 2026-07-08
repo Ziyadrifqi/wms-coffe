@@ -30,7 +30,13 @@ class StockMovementReportController extends Controller
         return StockMovement::query()
             ->with(['material', 'warehouse', 'creator'])
             ->when($request->warehouse_id, fn($q) => $q->where('warehouse_id', $request->warehouse_id))
-            ->when($request->material_id, fn($q) => $q->where('material_id', $request->material_id))
+            ->when($request->material_ids, function ($q) use ($request) {
+                $materialIds = is_array($request->material_ids)
+                    ? $request->material_ids
+                    : explode(',', $request->material_ids);
+
+                $q->whereIn('material_id', $materialIds);
+            })
             ->when($request->type, fn($q) => $q->where('type', $request->type))
             ->when($request->date_from, fn($q) => $q->whereDate('created_at', '>=', $request->date_from))
             ->when($request->date_to, fn($q) => $q->whereDate('created_at', '<=', $request->date_to))

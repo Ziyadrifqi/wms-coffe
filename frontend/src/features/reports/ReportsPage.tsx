@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Download, FileText } from 'lucide-react';
+import { Download, FileText, RotateCcw } from 'lucide-react';
 import DataTable from '../../components/common/DataTable';
 import Pagination from '../../components/common/Pagination';
+import MultiSelectSearch from '../../components/common/MultiSelectSearch';
 import { reportApi } from '../../api/report.api';
 import { warehouseApi, materialApi } from '../../api/masterData.api';
 import { downloadBlob } from '../../utils/downloadBlob';
@@ -21,17 +22,28 @@ const typeLabels: Record<string, string> = {
 export default function ReportsPage() {
   const [page, setPage] = useState(1);
   const [warehouseId, setWarehouseId] = useState('');
-  const [materialId, setMaterialId] = useState('');
+  const [materialIds, setMaterialIds] = useState<string[]>([]);
   const [type, setType] = useState('');
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
 
   const filterParams = {
     warehouse_id: warehouseId || undefined,
-    material_id: materialId || undefined,
+    material_ids: materialIds.length > 0 ? materialIds : undefined,
     type: type || undefined,
     date_from: dateFrom || undefined,
     date_to: dateTo || undefined,
+  };
+
+  const hasActiveFilter = !!(warehouseId || materialIds.length > 0 || type || dateFrom || dateTo);
+
+  const handleResetFilter = () => {
+    setWarehouseId('');
+    setMaterialIds([]);
+    setType('');
+    setDateFrom('');
+    setDateTo('');
+    setPage(1);
   };
 
   const { data: warehouses } = useQuery({
@@ -43,6 +55,8 @@ export default function ReportsPage() {
     queryKey: ['materials-all'],
     queryFn: () => materialApi.list({ per_page: 100 }).then((res) => res.data.data as Material[]),
   });
+
+  const materialOptions = (materials ?? []).map((m) => ({ id: m.id, label: m.name }));
 
   const { data, isLoading } = useQuery({
     queryKey: ['stock-movement-report', page, filterParams],
@@ -90,26 +104,57 @@ export default function ReportsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-        <select value={warehouseId} onChange={(e) => { setWarehouseId(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-          <option value="">Semua Gudang</option>
-          {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
-        </select>
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+          <select
+            value={warehouseId}
+            onChange={(e) => { setWarehouseId(e.target.value); setPage(1); }}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          >
+            <option value="">Semua Gudang</option>
+            {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </select>
 
-        <select value={materialId} onChange={(e) => { setMaterialId(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-          <option value="">Semua Material</option>
-          {materials?.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
-        </select>
+          <MultiSelectSearch
+            options={materialOptions}
+            selectedIds={materialIds}
+            onChange={(ids) => { setMaterialIds(ids); setPage(1); }}
+            placeholder="Semua Material"
+          />
 
-        <select value={type} onChange={(e) => { setType(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-300 rounded-md text-sm">
-          <option value="">Semua Tipe</option>
-          <option value="in">Masuk</option>
-          <option value="out">Keluar</option>
-          <option value="adjustment">Penyesuaian</option>
-        </select>
+          <select
+            value={type}
+            onChange={(e) => { setType(e.target.value); setPage(1); }}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          >
+            <option value="">Semua Tipe</option>
+            <option value="in">Masuk</option>
+            <option value="out">Keluar</option>
+            <option value="adjustment">Penyesuaian</option>
+          </select>
 
-        <input type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-300 rounded-md text-sm" />
-        <input type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(1); }} className="px-3 py-2 border border-gray-300 rounded-md text-sm" />
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          />
+          <input
+            type="date"
+            value={dateTo}
+            onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+          />
+        </div>
+
+        {hasActiveFilter && (
+          <button
+            onClick={handleResetFilter}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-600 mt-3"
+          >
+            <RotateCcw size={13} /> Reset semua filter
+          </button>
+        )}
       </div>
 
       <DataTable<StockMovementReportItem>
