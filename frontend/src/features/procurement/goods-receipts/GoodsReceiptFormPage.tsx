@@ -7,6 +7,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { purchaseOrderApi, goodsReceiptApi } from '../../../api/procurement.api';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
+import Button from '../../../components/common/Button';
+import { TextField } from '../../../components/common/FormField';
 
 const itemSchema = z.object({
   purchase_order_item_id: z.string(),
@@ -57,7 +59,6 @@ export default function GoodsReceiptFormPage() {
 
   const { fields } = useFieldArray({ control, name: 'items' });
 
-  // Isi item otomatis dari sisa qty PO yang belum diterima
   useEffect(() => {
     if (po) {
       const remainingItems = po.items
@@ -102,13 +103,11 @@ export default function GoodsReceiptFormPage() {
     onError: (err: unknown) => toast.error(getErrorMessage(err)),
   });
 
-  const onSubmit = (data: FormOutput) => mutation.mutate(data);
-
-  if (!po) return <div className="text-gray-400">Memuat data PO...</div>;
+  if (!po) return <div className="text-espresso/30 text-sm">Memuat data PO...</div>;
 
   if (fields.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 text-center text-gray-400">
+      <div className="bg-cream rounded-2xl border border-espresso/8 p-8 text-center text-espresso/40 text-sm">
         Semua item pada PO ini sudah diterima sepenuhnya.
       </div>
     );
@@ -116,87 +115,74 @@ export default function GoodsReceiptFormPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-1">Goods Receipt</h1>
-      <p className="text-sm text-gray-500 mb-6">Untuk PO: {po.po_number} — {po.supplier.name}</p>
+      <h1 className="font-display text-2xl font-medium text-espresso mb-1">Goods Receipt</h1>
+      <p className="text-sm text-espresso/45 mb-6">Untuk PO: <span className="font-mono">{po.po_number}</span> — {po.supplier.name}</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Terima</label>
-          <input
-            type="date"
-            {...register('receipt_date')}
-            className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm"
-          />
-          {errors.receipt_date && <p className="text-red-500 text-xs mt-1">{errors.receipt_date.message}</p>}
-        </div>
+      <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="bg-cream rounded-2xl border border-espresso/8 p-4 sm:p-6 space-y-6 shadow-sm shadow-espresso/[0.02]">
+        <TextField label="Tanggal Terima" type="date" {...register('receipt_date')} error={errors.receipt_date?.message} className="max-w-xs" />
 
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-700">Item Diterima</h3>
-          {fields.map((field, index) => (
-            <div key={field.id} className="bg-gray-50 p-3 rounded-md grid grid-cols-4 gap-3">
-              <div className="col-span-4 sm:col-span-1 flex items-center text-sm font-medium text-gray-700">
-                {field.material_name}
-                <span className="text-xs text-gray-400 ml-1">(sisa {field.max_qty})</span>
-              </div>
+          <h3 className="text-xs font-medium text-espresso/55 tracking-wide uppercase">Item Diterima</h3>
 
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Qty Diterima</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register(`items.${index}.qty_received`)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                />
-                {errors.items?.[index]?.qty_received && (
-                  <p className="text-red-500 text-xs mt-1">{errors.items[index]?.qty_received?.message}</p>
-                )}
-              </div>
+          <div className="bg-latte/40 rounded-xl border border-espresso/8 border-dashed p-3 sm:p-4 space-y-3">
+            {fields.map((field, index) => (
+              <div key={field.id} className="bg-cream p-3 rounded-lg border border-espresso/6 grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div className="sm:col-span-1 flex items-center text-sm font-medium text-espresso">
+                  {field.material_name}
+                  <span className="text-xs text-espresso/35 ml-1.5 font-mono">(sisa {field.max_qty})</span>
+                </div>
 
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Tgl Kadaluarsa (opsional)</label>
-                <input
-                  type="date"
-                  {...register(`items.${index}.expiry_date`)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                />
-              </div>
+                <div>
+                  <label className="block text-[11px] text-espresso/40 uppercase tracking-wide mb-1">Qty Diterima</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    {...register(`items.${index}.qty_received`)}
+                    className="w-full px-3 py-2 bg-latte/50 border border-espresso/12 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-caramel/40"
+                  />
+                  {errors.items?.[index]?.qty_received && (
+                    <p className="text-clay text-xs mt-1">{errors.items[index]?.qty_received?.message}</p>
+                  )}
+                </div>
 
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">No. Batch (opsional)</label>
-                <input
-                  type="text"
-                  {...register(`items.${index}.batch_number`)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-                />
+                <div>
+                  <label className="block text-[11px] text-espresso/40 uppercase tracking-wide mb-1">Tgl Kadaluarsa</label>
+                  <input
+                    type="date"
+                    {...register(`items.${index}.expiry_date`)}
+                    className="w-full px-3 py-2 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] text-espresso/40 uppercase tracking-wide mb-1">No. Batch</label>
+                  <input
+                    type="text"
+                    {...register(`items.${index}.batch_number`)}
+                    className="w-full px-3 py-2 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
+          <label className="block text-xs font-medium text-espresso/55 mb-1.5 tracking-wide uppercase">Catatan</label>
           <textarea
             {...register('notes')}
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="w-full px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
           />
         </div>
 
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => navigate(`/procurement/purchase-orders/${poId}`)}
-            className="flex-1 border border-gray-300 py-2 rounded-md text-sm font-medium hover:bg-gray-50"
-          >
+          <Button type="button" variant="secondary" fullWidth onClick={() => navigate(`/procurement/purchase-orders/${poId}`)}>
             Batal
-          </button>
-          <button
-            type="submit"
-            disabled={mutation.isPending}
-            className="flex-1 bg-blue-600 text-white py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
+          </Button>
+          <Button type="submit" fullWidth disabled={mutation.isPending}>
             {mutation.isPending ? 'Menyimpan...' : 'Konfirmasi Penerimaan'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

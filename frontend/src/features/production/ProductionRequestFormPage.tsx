@@ -8,6 +8,8 @@ import { Plus, Trash2 } from 'lucide-react';
 import { productionRequestApi } from '../../api/production.api';
 import { warehouseApi, materialApi } from '../../api/masterData.api';
 import { getErrorMessage } from '../../utils/getErrorMessage';
+import { SelectField, TextField, TextareaField } from '../../components/common/FormField';
+import Button from '../../components/common/Button';
 import type { Warehouse, Material } from '../../types/masterData';
 
 const itemSchema = z.object({
@@ -64,88 +66,60 @@ export default function ProductionRequestFormPage() {
     onError: (err: unknown) => toast.error(getErrorMessage(err)),
   });
 
-  const onSubmit = (data: FormOutput) => mutation.mutate(data);
-
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Buat Production Request</h1>
+      <h1 className="font-display text-2xl font-medium text-espresso mb-6">Buat Production Request</h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Gudang</label>
-            <select
-              {...register('warehouse_id')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-            >
-              <option value="">Pilih gudang</option>
-              {warehouses?.map((w) => (
-                <option key={w.id} value={w.id}>{w.name}</option>
-              ))}
-            </select>
-            {errors.warehouse_id && <p className="text-red-500 text-xs mt-1">{errors.warehouse_id.message}</p>}
-          </div>
+      <form onSubmit={handleSubmit((data) => mutation.mutate(data))} className="bg-cream rounded-2xl border border-espresso/8 p-4 sm:p-6 space-y-6 shadow-sm shadow-espresso/[0.02]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SelectField label="Gudang" {...register('warehouse_id')} error={errors.warehouse_id?.message}>
+            <option value="">Pilih gudang</option>
+            {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
+          </SelectField>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal Request</label>
-            <input
-              type="date"
-              {...register('request_date')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-            />
-            {errors.request_date && <p className="text-red-500 text-xs mt-1">{errors.request_date.message}</p>}
-          </div>
+          <TextField label="Tanggal Request" type="date" {...register('request_date')} error={errors.request_date?.message} />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Catatan</label>
-          <textarea
-            {...register('notes')}
-            rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
-          />
-        </div>
+        <TextareaField label="Catatan" rows={2} {...register('notes')} />
 
         <div>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-sm font-semibold text-gray-700">Item Bahan yang Diminta</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-medium text-espresso/55 tracking-wide uppercase">Item Bahan yang Diminta</h3>
             <button
               type="button"
               onClick={() => append({ material_id: '', qty_requested: 1 })}
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+              className="flex items-center gap-1 text-sm text-caramel hover:text-caramel-dark font-medium"
             >
               <Plus size={14} /> Tambah Item
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="bg-latte/40 rounded-xl border border-espresso/8 border-dashed p-3 sm:p-4 space-y-3">
             {fields.map((field, index) => (
-<div key={field.id} className="flex flex-col sm:flex-row gap-2 sm:items-start bg-gray-50 p-3 rounded-md">
+              <div key={field.id} className="flex flex-col sm:flex-row gap-2 sm:items-start bg-cream p-3 rounded-lg border border-espresso/6">
                 <div className="flex-1">
                   <select
                     {...register(`items.${index}.material_id`)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full px-3 py-2 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
                   >
                     <option value="">Pilih material</option>
-                    {materials?.map((m) => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
-                    ))}
+                    {materials?.map((m) => <option key={m.id} value={m.id}>{m.name}</option>)}
                   </select>
                   {errors.items?.[index]?.material_id && (
-                    <p className="text-red-500 text-xs mt-1">{errors.items[index]?.material_id?.message}</p>
+                    <p className="text-clay text-xs mt-1">{errors.items[index]?.material_id?.message}</p>
                   )}
                 </div>
 
-               <div className="w-full sm:w-32">
+                <div className="w-full sm:w-32">
                   <input
                     type="number"
                     step="0.01"
                     placeholder="Qty"
                     {...register(`items.${index}.qty_requested`)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                    className="w-full px-3 py-2 bg-latte/50 border border-espresso/12 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-caramel/40"
                   />
                   {errors.items?.[index]?.qty_requested && (
-                    <p className="text-red-500 text-xs mt-1">{errors.items[index]?.qty_requested?.message}</p>
+                    <p className="text-clay text-xs mt-1">{errors.items[index]?.qty_requested?.message}</p>
                   )}
                 </div>
 
@@ -153,7 +127,7 @@ export default function ProductionRequestFormPage() {
                   type="button"
                   onClick={() => remove(index)}
                   disabled={fields.length === 1}
-                  className="text-red-500 hover:text-red-700 disabled:opacity-30 mt-2"
+                  className="text-clay/60 hover:text-clay disabled:opacity-20 mt-2 sm:mt-2.5 self-end sm:self-start"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -161,26 +135,16 @@ export default function ProductionRequestFormPage() {
             ))}
           </div>
 
-          {errors.items?.message && (
-            <p className="text-red-500 text-xs mt-1">{errors.items.message}</p>
-          )}
+          {errors.items?.message && <p className="text-clay text-xs mt-2">{errors.items.message}</p>}
         </div>
 
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => navigate('/production/requests')}
-            className="flex-1 border border-gray-300 py-2 rounded-md text-sm font-medium hover:bg-gray-50"
-          >
+          <Button type="button" variant="secondary" fullWidth onClick={() => navigate('/production/requests')}>
             Batal
-          </button>
-          <button
-            type="submit"
-            disabled={mutation.isPending}
-            className="flex-1 bg-blue-600 text-white py-2 rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
+          </Button>
+          <Button type="submit" fullWidth disabled={mutation.isPending}>
             {mutation.isPending ? 'Menyimpan...' : 'Ajukan Request'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>
