@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import DataTable from '../../../components/common/DataTable';
 import Modal from '../../../components/common/Modal';
 import Pagination from '../../../components/common/Pagination';
+import Button from '../../../components/common/Button';
+import PageHeader from '../../../components/common/PageHeader';
 import { warehouseApi } from '../../../api/masterData.api';
 import type { Warehouse } from '../../../types/masterData';
 import WarehouseForm from './WarehouseForm';
@@ -18,8 +20,7 @@ export default function WarehousePage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['warehouses', page, search],
-    queryFn: () =>
-      warehouseApi.list({ page, search, per_page: 10 }).then((res) => res.data),
+    queryFn: () => warehouseApi.list({ page, search, per_page: 10 }).then((res) => res.data),
   });
 
   const deleteMutation = useMutation({
@@ -54,25 +55,21 @@ export default function WarehousePage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Warehouse</h1>
-        <button
-          onClick={handleAdd}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-        >
-          <Plus size={16} /> Tambah Warehouse
-        </button>
-      </div>
+      <PageHeader
+        title="Warehouse"
+        actions={
+          <Button onClick={handleAdd} className="flex items-center gap-2">
+            <Plus size={16} /> Tambah Warehouse
+          </Button>
+        }
+      />
 
       <input
         type="text"
         placeholder="Cari warehouse..."
         value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        className="w-full max-w-sm mb-4 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        className="w-full sm:max-w-sm mb-4 px-3.5 py-2.5 bg-cream border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
       />
 
       <DataTable<Warehouse>
@@ -80,16 +77,12 @@ export default function WarehousePage() {
         data={data?.data ?? []}
         columns={[
           { header: 'Kode', accessor: (row) => row.code },
-          { header: 'Nama', accessor: (row) => row.name },
-          { header: 'Alamat', accessor: (row) => row.address ?? '-' },
+          { header: 'Nama', accessor: (row) => row.name, className: 'font-sans' },
+          { header: 'Alamat', accessor: (row) => row.address ?? '-', className: 'font-sans' },
           {
             header: 'Status',
             accessor: (row) => (
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  row.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                }`}
-              >
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_active ? 'bg-moss-light text-moss' : 'bg-espresso/8 text-espresso/40'}`}>
                 {row.is_active ? 'Aktif' : 'Nonaktif'}
               </span>
             ),
@@ -97,11 +90,11 @@ export default function WarehousePage() {
           {
             header: 'Aksi',
             accessor: (row) => (
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(row)} className="text-blue-600 hover:text-blue-800">
+              <div className="flex gap-3">
+                <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
                   <Pencil size={16} />
                 </button>
-                <button onClick={() => handleDelete(row)} className="text-red-600 hover:text-red-800">
+                <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -116,11 +109,7 @@ export default function WarehousePage() {
         onPageChange={setPage}
       />
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingWarehouse ? 'Edit Warehouse' : 'Tambah Warehouse'}
-      >
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingWarehouse ? 'Edit Warehouse' : 'Tambah Warehouse'}>
         <WarehouseForm warehouse={editingWarehouse} onSuccess={handleFormSuccess} />
       </Modal>
     </div>
