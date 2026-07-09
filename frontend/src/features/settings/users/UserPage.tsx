@@ -4,6 +4,8 @@ import { Plus, Pencil } from 'lucide-react';
 import DataTable from '../../../components/common/DataTable';
 import Modal from '../../../components/common/Modal';
 import Pagination from '../../../components/common/Pagination';
+import Button from '../../../components/common/Button';
+import PageHeader from '../../../components/common/PageHeader';
 import { userManagementApi } from '../../../api/user.api';
 import type { ManagedUser } from '../../../types/user';
 import UserForm from './UserForm';
@@ -37,43 +39,41 @@ export default function UserPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Manajemen User</h1>
-        <button
-          onClick={handleAdd}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-        >
-          <Plus size={16} /> Tambah User
-        </button>
-      </div>
+      <PageHeader
+        title="Manajemen User"
+        actions={
+          <Button onClick={handleAdd} className="flex items-center gap-2">
+            <Plus size={16} /> Tambah User
+          </Button>
+        }
+      />
 
       <input
         type="text"
         placeholder="Cari nama atau email..."
         value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        className="w-full max-w-sm mb-4 px-3 py-2 border border-gray-300 rounded-md text-sm"
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        className="w-full sm:max-w-sm mb-4 px-3.5 py-2.5 bg-cream border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
       />
 
       <DataTable<ManagedUser>
         isLoading={isLoading}
         data={data?.data ?? []}
         columns={[
-          { header: 'Nama', accessor: (row) => row.name },
+          { header: 'Nama', accessor: (row) => row.name, className: 'font-sans' },
           { header: 'Email', accessor: (row) => row.email },
           {
             header: 'Role',
             accessor: (row) => (
-              <span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium capitalize">{row.role}</span>
+              <span className="px-2.5 py-1 bg-caramel/10 text-caramel-dark rounded-full text-xs font-medium capitalize">
+                {row.role}
+              </span>
             ),
           },
           {
             header: 'Status',
             accessor: (row) => (
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_active ? 'bg-moss-light text-moss' : 'bg-espresso/8 text-espresso/40'}`}>
                 {row.is_active ? 'Aktif' : 'Nonaktif'}
               </span>
             ),
@@ -82,15 +82,15 @@ export default function UserPage() {
             header: 'Password',
             accessor: (row) =>
               row.must_change_password ? (
-                <span className="text-xs text-yellow-600">Belum diganti</span>
+                <span className="text-xs text-honey font-medium">Belum diganti</span>
               ) : (
-                <span className="text-xs text-gray-400">Sudah diganti</span>
+                <span className="text-xs text-espresso/30">Sudah diganti</span>
               ),
           },
           {
             header: 'Aksi',
             accessor: (row) => (
-              <button onClick={() => handleEdit(row)} className="text-blue-600 hover:text-blue-800">
+              <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
                 <Pencil size={16} />
               </button>
             ),
