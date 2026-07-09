@@ -1,12 +1,12 @@
 const statusStyles: Record<string, string> = {
-  draft: 'bg-gray-100 text-gray-600',
-  pending: 'bg-yellow-100 text-yellow-700',
-  in_progress: 'bg-yellow-100 text-yellow-700',
-  approved: 'bg-blue-100 text-blue-700',
-  rejected: 'bg-red-100 text-red-700',
-  completed: 'bg-green-100 text-green-700',
-  fulfilled: 'bg-green-100 text-green-700',
-  cancelled: 'bg-gray-100 text-gray-400',
+  draft: 'bg-espresso/8 text-espresso/50',
+  pending: 'bg-honey-light text-honey',
+  in_progress: 'bg-honey-light text-honey',
+  approved: 'bg-caramel/10 text-caramel-dark',
+  rejected: 'bg-clay-light text-clay',
+  completed: 'bg-moss-light text-moss',
+  fulfilled: 'bg-moss-light text-moss',
+  cancelled: 'bg-espresso/8 text-espresso/40',
 };
 
 const statusLabels: Record<string, string> = {
@@ -22,7 +22,7 @@ const statusLabels: Record<string, string> = {
 
 export default function StatusBadge({ status }: { status: string }) {
   return (
-    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusStyles[status] ?? 'bg-gray-100 text-gray-500'}`}>
+    <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${statusStyles[status] ?? 'bg-espresso/8 text-espresso/50'}`}>
       {statusLabels[status] ?? status}
     </span>
   );

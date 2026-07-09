@@ -8,22 +8,20 @@ export default function Pagination({ currentPage, lastPage, onPageChange }: Pagi
   if (lastPage <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between mt-4">
-      <span className="text-sm text-gray-500">
-        Halaman {currentPage} dari {lastPage}
-      </span>
+    <div className="flex items-center justify-between mt-4 gap-3">
+      <span className="text-xs text-espresso/40">Halaman {currentPage} dari {lastPage}</span>
       <div className="flex gap-2">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          className="px-3 py-1.5 text-sm border border-gray-300 rounded-md disabled:opacity-40 hover:bg-gray-50"
+          className="px-3 py-1.5 text-sm border border-espresso/12 rounded-lg disabled:opacity-30 hover:bg-espresso/5 transition"
         >
           Sebelumnya
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= lastPage}
-          className="px-3 py-1.5 text-sm border border-gray-300 rounded-md disabled:opacity-40 hover:bg-gray-50"
+          className="px-3 py-1.5 text-sm border border-espresso/12 rounded-lg disabled:opacity-30 hover:bg-espresso/5 transition"
         >
           Selanjutnya
         </button>

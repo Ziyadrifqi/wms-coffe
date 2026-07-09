@@ -3,7 +3,7 @@ import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Package, ShoppingCart, Warehouse,
   Factory, FileBarChart, Settings, LogOut, ChevronDown, X,
-  PanelLeftClose, PanelLeftOpen,
+  PanelLeftClose, PanelLeftOpen, Coffee,
 } from 'lucide-react';
 import { useAuthStore } from '../../stores/authStore';
 import { logout as logoutApi } from '../../api/auth.api';
@@ -47,11 +47,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const [openMenu, setOpenMenu] = useState<string | null>('Master Data');
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  // Collapse state khusus desktop, disimpan di localStorage biar preferensi diingat
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
-    return localStorage.getItem('sidebar-collapsed') === 'true';
-  });
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(() => localStorage.getItem('sidebar-collapsed') === 'true');
 
   useEffect(() => {
     localStorage.setItem('sidebar-collapsed', String(isCollapsed));
@@ -70,7 +66,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   };
 
   const toggleSubmenu = (label: string) => {
-    if (isCollapsed) return; // gak ada submenu saat collapsed
+    if (isCollapsed) return;
     setOpenMenu((prev) => (prev === label ? null : label));
   };
 
@@ -86,65 +82,59 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const toggleCollapse = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      if (next) setOpenMenu(null); // tutup semua submenu saat collapse
+      if (next) setOpenMenu(null);
       return next;
     });
   };
 
   return (
     <>
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 md:hidden"
-          onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-espresso/50 z-30 md:hidden" onClick={onClose} />}
 
       <aside
         className={`
-          fixed md:sticky top-0 left-0 h-screen bg-white border-r border-gray-200
-          flex flex-col z-40 transition-all duration-200
+          fixed md:sticky top-0 left-0 h-screen bg-roast border-r border-black/20
+          flex flex-col z-40 transition-all duration-300 ease-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0
-          ${isCollapsed ? 'md:w-20' : 'md:w-64'} w-64
+          ${isCollapsed ? 'md:w-[76px]' : 'md:w-64'} w-64
         `}
       >
-        <div className={`p-6 border-b border-gray-200 flex items-center ${isCollapsed ? 'md:justify-center md:p-4' : 'justify-between'}`}>
-          <div className={isCollapsed ? 'md:hidden' : ''}>
-            <h1 className="text-lg font-bold text-gray-900">WMS Coffee</h1>
-            <button
-              onClick={handleProfileClick}
-              className="text-xs text-gray-500 mt-1 hover:text-blue-600 hover:underline transition text-left"
-            >
-              {user?.name}
-            </button>
+        <div className={`p-5 border-b border-white/10 flex items-center ${isCollapsed ? 'md:justify-center' : 'justify-between'}`}>
+          <div className={`flex items-center gap-2.5 ${isCollapsed ? 'md:hidden' : ''}`}>
+            <div className="w-8 h-8 rounded-full bg-caramel/20 flex items-center justify-center shrink-0">
+              <Coffee size={16} className="text-caramel" strokeWidth={2} />
+            </div>
+            <div>
+              <h1 className="font-display text-base font-medium text-latte leading-tight">WMS Coffee</h1>
+              <button onClick={handleProfileClick} className="text-[11px] text-latte/50 hover:text-caramel transition">
+                {user?.name}
+              </button>
+            </div>
           </div>
 
           {isCollapsed && (
             <button
               onClick={handleProfileClick}
-              className="hidden md:flex w-9 h-9 rounded-full bg-blue-100 text-blue-600 items-center justify-center text-sm font-semibold"
+              className="hidden md:flex w-9 h-9 rounded-full bg-caramel/20 text-caramel items-center justify-center text-sm font-semibold"
               title={user?.name}
             >
               {user?.name?.charAt(0).toUpperCase()}
             </button>
           )}
 
-          <button onClick={onClose} className="md:hidden text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="md:hidden text-latte/50 hover:text-latte">
             <X size={20} />
           </button>
         </div>
 
-        {/* Tombol collapse — cuma tampil di desktop */}
         <button
           onClick={toggleCollapse}
-          className="hidden md:flex items-center justify-center gap-2 mx-3 mt-3 px-3 py-2 rounded-md text-xs font-medium text-gray-500 hover:bg-gray-50 border border-gray-200"
-          title={isCollapsed ? 'Perluas sidebar' : 'Perkecil sidebar'}
+          className="hidden md:flex items-center justify-center gap-2 mx-3 mt-3 px-3 py-2 rounded-lg text-xs font-medium text-latte/40 hover:text-latte hover:bg-white/5 transition"
         >
-          {isCollapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          {!isCollapsed && <span>Perkecil</span>}
+          {isCollapsed ? <PanelLeftOpen size={15} /> : <><PanelLeftClose size={15} /><span>Perkecil</span></>}
         </button>
 
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto overflow-x-hidden">
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto overflow-x-hidden">
           {menuItems.map((item) => {
             if (item.submenu) {
               const isOpenSub = openMenu === item.label;
@@ -155,32 +145,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   <button
                     onClick={() => toggleSubmenu(item.label)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`flex items-center w-full px-3 py-2 rounded-md text-sm font-medium transition ${
+                    className={`flex items-center w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                       isCollapsed ? 'md:justify-center' : 'justify-between'
-                    } ${isActiveGroup ? 'text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`}
+                    } ${isActiveGroup ? 'text-caramel bg-white/5' : 'text-latte/60 hover:bg-white/5 hover:text-latte'}`}
                   >
-                    <span className={`flex items-center gap-3 ${isCollapsed ? 'md:gap-0' : ''}`}>
-                      <item.icon size={18} className="shrink-0" />
+                    <span className="flex items-center gap-3">
+                      <item.icon size={17} className="shrink-0" />
                       <span className={isCollapsed ? 'md:hidden' : ''}>{item.label}</span>
                     </span>
-                    <ChevronDown
-                      size={16}
-                      className={`transition-transform ${isOpenSub ? 'rotate-180' : ''} ${isCollapsed ? 'md:hidden' : ''}`}
-                    />
+                    <ChevronDown size={14} className={`transition-transform ${isOpenSub ? 'rotate-180' : ''} ${isCollapsed ? 'md:hidden' : ''}`} />
                   </button>
 
                   {isOpenSub && !isCollapsed && (
-                    <div className="ml-9 mt-1 space-y-1">
+                    <div className="ml-9 mt-0.5 space-y-0.5 animate-page-in">
                       {item.submenu.map((sub) => (
                         <NavLink
                           key={sub.path}
                           to={sub.path}
                           onClick={handleNavClick}
                           className={({ isActive }) =>
-                            `block px-3 py-1.5 rounded-md text-sm transition ${
-                              isActive
-                                ? 'bg-blue-50 text-blue-600 font-medium'
-                                : 'text-gray-500 hover:bg-gray-50'
+                            `block px-3 py-1.5 rounded-lg text-sm transition-colors ${
+                              isActive ? 'bg-caramel/15 text-caramel font-medium' : 'text-latte/45 hover:bg-white/5 hover:text-latte/80'
                             }`
                           }
                         >
@@ -200,51 +185,45 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={handleNavClick}
                 title={isCollapsed ? item.label : undefined}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
-                    isCollapsed ? 'md:justify-center md:gap-0' : ''
-                  } ${isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-600 hover:bg-gray-50'}`
+                  `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    isCollapsed ? 'md:justify-center' : ''
+                  } ${isActive ? 'bg-caramel/15 text-caramel' : 'text-latte/60 hover:bg-white/5 hover:text-latte'}`
                 }
               >
-                <item.icon size={18} className="shrink-0" />
+                <item.icon size={17} className="shrink-0" />
                 <span className={isCollapsed ? 'md:hidden' : ''}>{item.label}</span>
               </NavLink>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t border-gray-200">
+        <div className="p-3 border-t border-white/10">
           <button
             onClick={() => setIsLogoutModalOpen(true)}
             title={isCollapsed ? 'Keluar' : undefined}
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 w-full transition ${
-              isCollapsed ? 'md:justify-center md:gap-0' : ''
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-clay/80 hover:bg-clay/10 hover:text-clay w-full transition-colors ${
+              isCollapsed ? 'md:justify-center' : ''
             }`}
           >
-            <LogOut size={18} className="shrink-0" />
+            <LogOut size={17} className="shrink-0" />
             <span className={isCollapsed ? 'md:hidden' : ''}>Keluar</span>
           </button>
         </div>
       </aside>
 
-      <Modal
-        isOpen={isLogoutModalOpen}
-        onClose={() => setIsLogoutModalOpen(false)}
-        title="Konfirmasi Keluar"
-      >
-        <p className="text-sm text-gray-600 mb-6">
-          Apakah Anda yakin ingin keluar dari akun ini?
-        </p>
+      <Modal isOpen={isLogoutModalOpen} onClose={() => setIsLogoutModalOpen(false)} title="Konfirmasi Keluar">
+        <p className="text-sm text-espresso/60 mb-6">Apakah Anda yakin ingin keluar dari akun ini?</p>
         <div className="flex gap-2">
           <button
             onClick={() => setIsLogoutModalOpen(false)}
-            className="flex-1 border border-gray-300 py-2 rounded-md text-sm font-medium hover:bg-gray-50"
+            className="flex-1 border border-espresso/15 text-espresso py-2 rounded-lg text-sm font-medium hover:bg-espresso/5"
           >
             Batal
           </button>
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="flex-1 bg-red-600 text-white py-2 rounded-md text-sm font-medium hover:bg-red-700 disabled:opacity-50"
+            className="flex-1 bg-clay text-white py-2 rounded-lg text-sm font-medium hover:bg-clay/90 active:scale-[0.98] disabled:opacity-50 transition-all"
           >
             {isLoggingOut ? 'Memproses...' : 'Ya, Keluar'}
           </button>

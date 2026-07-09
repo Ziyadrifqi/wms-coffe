@@ -8,20 +8,20 @@ interface KpiCardProps {
 }
 
 const toneStyles = {
-  default: 'bg-blue-50 text-blue-600',
-  warning: 'bg-yellow-50 text-yellow-600',
-  danger: 'bg-red-50 text-red-600',
+  default: 'bg-caramel/10 text-caramel',
+  warning: 'bg-honey-light text-honey',
+  danger: 'bg-clay-light text-clay',
 };
 
 export default function KpiCard({ label, value, icon: Icon, tone = 'default' }: KpiCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-4">
+    <div className="bg-cream rounded-xl border border-espresso/8 p-4 flex items-center gap-3.5 hover:shadow-md hover:shadow-espresso/5 hover:-translate-y-0.5 transition-all duration-200">
       <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${toneStyles[tone]}`}>
-        <Icon size={20} />
+        <Icon size={19} />
       </div>
-      <div>
-        <p className="text-2xl font-bold text-gray-900">{value}</p>
-        <p className="text-xs text-gray-500">{label}</p>
+      <div className="min-w-0">
+        <p className="font-display text-2xl font-medium text-espresso leading-tight">{value}</p>
+        <p className="text-xs text-espresso/45 truncate">{label}</p>
       </div>
     </div>
   );
