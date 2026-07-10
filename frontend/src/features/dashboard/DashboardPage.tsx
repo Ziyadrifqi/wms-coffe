@@ -1,20 +1,21 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Package, AlertTriangle, Clock, XCircle, ShoppingCart, Factory } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Package, AlertTriangle, Clock, XCircle, ShoppingCart, Factory, AlertCircle } from 'lucide-react';
 import { dashboardApi } from '../../api/dashboard.api';
 import { warehouseApi } from '../../api/masterData.api';
+import { useAuthStore } from '../../stores/authStore';
 import KpiCard from './components/KpiCard';
 import StockTrendChart from './components/StockTrendChart';
 import LowStockList from './components/LowStockList';
 import ExpiringStockList from './components/ExpiringStockList';
 import ActivityFeed from './components/ActivityFeed';
 import type { Warehouse } from '../../types/masterData';
-import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '../../stores/authStore';
-import { AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
   const [warehouseId, setWarehouseId] = useState<string>('');
+  const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
 
   const { data: warehouses } = useQuery({
     queryKey: ['warehouses-all'],
@@ -26,43 +27,40 @@ export default function DashboardPage() {
     queryFn: () => dashboardApi.getKpis(warehouseId || undefined).then((res) => res.data.data),
   });
 
-  const user = useAuthStore((state) => state.user);
-const navigate = useNavigate();
-
   return (
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-{user?.must_change_password && (
-  <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 text-sm rounded-md p-4 mb-6 flex items-center justify-between gap-3">
-    <div className="flex items-center gap-2">
-      <AlertCircle size={18} />
-      Anda masih menggunakan password sementara. Segera ganti demi keamanan akun Anda.
-    </div>
-    <button
-      onClick={() => navigate('/profile')}
-      className="bg-yellow-600 text-white px-3 py-1.5 rounded-md text-xs font-medium hover:bg-yellow-700 whitespace-nowrap"
-    >
-      Ganti Sekarang
-    </button>
-  </div>
-)}
+        <h1 className="font-display text-2xl font-medium text-espresso">Dashboard</h1>
+
         <select
           value={warehouseId}
           onChange={(e) => setWarehouseId(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md text-sm w-full sm:w-auto"
+          className="px-3.5 py-2.5 bg-cream border border-espresso/12 rounded-lg text-sm w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-caramel/40"
         >
           <option value="">Semua Gudang</option>
-          {warehouses?.map((w) => (
-            <option key={w.id} value={w.id}>{w.name}</option>
-          ))}
+          {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
         </select>
       </div>
+
+      {user?.must_change_password && (
+        <div className="bg-honey-light border border-honey/20 text-honey text-sm rounded-lg p-4 mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={18} className="shrink-0" />
+            Anda masih menggunakan password sementara. Segera ganti demi keamanan akun Anda.
+          </div>
+          <button
+            onClick={() => navigate('/profile')}
+            className="bg-honey text-white px-3 py-1.5 rounded-lg text-xs font-medium hover:bg-honey/90 whitespace-nowrap transition"
+          >
+            Ganti Sekarang
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 h-[72px] animate-pulse" />
+            <div key={i} className="rounded-xl h-[72px] animate-shimmer" />
           ))}
         </div>
       ) : (

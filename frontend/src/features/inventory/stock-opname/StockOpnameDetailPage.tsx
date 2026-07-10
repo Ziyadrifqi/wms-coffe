@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { ArrowLeft } from 'lucide-react';
 import { stockOpnameApi } from '../../../api/inventory.api';
 import StatusBadge from '../../../components/common/StatusBadge';
+import Button from '../../../components/common/Button';
 import { getErrorMessage } from '../../../utils/getErrorMessage';
 
 export default function StockOpnameDetailPage() {
@@ -13,28 +14,27 @@ export default function StockOpnameDetailPage() {
   const queryClient = useQueryClient();
 
   const [qtyActual, setQtyActual] = useState<Record<string, number>>({});
-const [notes, setNotes] = useState<Record<string, string>>({});
-const [syncedOpnameId, setSyncedOpnameId] = useState<string | null>(null);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [syncedOpnameId, setSyncedOpnameId] = useState<string | null>(null);
 
-const { data, isLoading } = useQuery({
-  queryKey: ['stock-opname', id],
-  queryFn: () => stockOpnameApi.get(id!).then((res) => res.data.data),
-  enabled: !!id,
-});
-
-// Sinkronisasi state input dari data — dijalankan saat render, dijaga oleh perbandingan ID
-// (bukan di useEffect, sesuai rekomendasi React untuk pola "adjust state saat prop berubah")
-if (data && data.id !== syncedOpnameId) {
-  const qtyMap: Record<string, number> = {};
-  const notesMap: Record<string, string> = {};
-  data.items.forEach((item) => {
-    qtyMap[item.id] = item.qty_actual;
-    notesMap[item.id] = item.notes ?? '';
+  const { data, isLoading } = useQuery({
+    queryKey: ['stock-opname', id],
+    queryFn: () => stockOpnameApi.get(id!).then((res) => res.data.data),
+    enabled: !!id,
   });
-  setQtyActual(qtyMap);
-  setNotes(notesMap);
-  setSyncedOpnameId(data.id);
-}
+
+  if (data && data.id !== syncedOpnameId) {
+    const qtyMap: Record<string, number> = {};
+    const notesMap: Record<string, string> = {};
+    data.items.forEach((item) => {
+      qtyMap[item.id] = item.qty_actual;
+      notesMap[item.id] = item.notes ?? '';
+    });
+    setQtyActual(qtyMap);
+    setNotes(notesMap);
+    setSyncedOpnameId(data.id);
+  }
+
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['stock-opname', id] });
     queryClient.invalidateQueries({ queryKey: ['stock-opnames'] });
@@ -50,24 +50,18 @@ if (data && data.id !== syncedOpnameId) {
           notes: notes[itemId] || undefined,
         }))
       ),
-    onSuccess: () => {
-      toast.success('Hasil hitung fisik berhasil disimpan');
-      invalidate();
-    },
+    onSuccess: () => { toast.success('Hasil hitung fisik berhasil disimpan'); invalidate(); },
     onError: (err: unknown) => toast.error(getErrorMessage(err)),
   });
 
   const completeMutation = useMutation({
     mutationFn: () => stockOpnameApi.complete(id!),
-    onSuccess: () => {
-      toast.success('Stock opname selesai, stok telah disesuaikan');
-      invalidate();
-    },
+    onSuccess: () => { toast.success('Stock opname selesai, stok telah disesuaikan'); invalidate(); },
     onError: (err: unknown) => toast.error(getErrorMessage(err)),
   });
 
-  if (isLoading) return <div className="text-gray-400">Memuat data...</div>;
-  if (!data) return <div className="text-gray-400">Data tidak ditemukan.</div>;
+  if (isLoading) return <div className="text-espresso/30 text-sm">Memuat data...</div>;
+  if (!data) return <div className="text-espresso/30 text-sm">Data tidak ditemukan.</div>;
 
   const isEditable = data.status === 'in_progress';
 
@@ -75,27 +69,23 @@ if (data && data.id !== syncedOpnameId) {
     <div>
       <button
         onClick={() => navigate('/inventory/stock-opnames')}
-        className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-4"
+        className="flex items-center gap-1 text-sm text-espresso/50 hover:text-espresso mb-4"
       >
         <ArrowLeft size={16} /> Kembali
       </button>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+      <div className="bg-cream rounded-2xl border border-espresso/8 p-4 sm:p-6 shadow-sm shadow-espresso/[0.02]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-dashed border-espresso/12">
           <div>
-            <h1 className="text-xl font-bold text-gray-900">{data.opname_number}</h1>
-            <div className="mt-1"><StatusBadge status={data.status} /></div>
+            <h1 className="font-display text-xl font-medium text-espresso font-mono">{data.opname_number}</h1>
+            <div className="mt-1.5"><StatusBadge status={data.status} /></div>
           </div>
 
           {isEditable && (
             <div className="flex gap-2">
-              <button
-                onClick={() => saveMutation.mutate()}
-                disabled={saveMutation.isPending}
-                className="flex-1 sm:flex-none border border-blue-600 text-blue-600 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-50"
-              >
+              <Button variant="secondary" onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="flex-1 sm:flex-none">
                 {saveMutation.isPending ? 'Menyimpan...' : 'Simpan'}
-              </button>
+              </Button>
               <button
                 onClick={() => {
                   if (confirm('Selesaikan opname? Stok akan otomatis disesuaikan berdasarkan selisih dan tidak bisa diubah lagi.')) {
@@ -103,7 +93,7 @@ if (data && data.id !== syncedOpnameId) {
                   }
                 }}
                 disabled={completeMutation.isPending}
-                className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700"
+                className="flex-1 sm:flex-none bg-moss text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-moss/90 active:scale-[0.98] transition-all"
               >
                 {completeMutation.isPending ? 'Memproses...' : 'Selesaikan Opname'}
               </button>
@@ -113,73 +103,69 @@ if (data && data.id !== syncedOpnameId) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mb-6">
           <div>
-            <span className="text-gray-500">Gudang</span>
-            <p className="font-medium text-gray-900">{data.warehouse.name}</p>
+            <span className="text-espresso/40 text-xs uppercase tracking-wide">Gudang</span>
+            <p className="font-medium text-espresso mt-0.5">{data.warehouse.name}</p>
           </div>
           <div>
-            <span className="text-gray-500">Tanggal Opname</span>
-            <p className="font-medium text-gray-900">{data.opname_date}</p>
+            <span className="text-espresso/40 text-xs uppercase tracking-wide">Tanggal Opname</span>
+            <p className="font-medium text-espresso mt-0.5 font-mono">{data.opname_date}</p>
           </div>
         </div>
 
         {data.items.length === 0 ? (
-          <div className="text-center text-gray-400 py-8">
+          <div className="text-center text-espresso/35 text-sm py-8">
             Tidak ada material dengan stok di gudang ini.
           </div>
         ) : (
           <div className="overflow-x-auto mb-4 -mx-4 px-4 sm:-mx-6 sm:px-6">
             <table className="w-full text-sm min-w-[700px]">
-              <thead className="bg-gray-50">
+              <thead className="border-b border-dashed border-espresso/15">
                 <tr>
-                  <th className="text-left px-3 py-2">Material</th>
-                  <th className="text-right px-3 py-2">Qty Sistem</th>
-                  <th className="text-right px-3 py-2">Qty Fisik</th>
-                  <th className="text-right px-3 py-2">Selisih</th>
-                  <th className="text-left px-3 py-2">Catatan</th>
+                  <th className="text-left px-3 py-2 text-xs text-espresso/40 uppercase tracking-wide">Material</th>
+                  <th className="text-right px-3 py-2 text-xs text-espresso/40 uppercase tracking-wide">Qty Sistem</th>
+                  <th className="text-right px-3 py-2 text-xs text-espresso/40 uppercase tracking-wide">Qty Fisik</th>
+                  <th className="text-right px-3 py-2 text-xs text-espresso/40 uppercase tracking-wide">Selisih</th>
+                  <th className="text-left px-3 py-2 text-xs text-espresso/40 uppercase tracking-wide">Catatan</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-dashed divide-espresso/8">
                 {data.items.map((item) => {
                   const currentQty = qtyActual[item.id] ?? item.qty_actual;
                   const difference = currentQty - item.qty_system;
 
                   return (
                     <tr key={item.id}>
-                      <td className="px-3 py-2 whitespace-nowrap">{item.material.name}</td>
-                      <td className="px-3 py-2 text-right whitespace-nowrap">{item.qty_system}</td>
-                      <td className="px-3 py-2 text-right whitespace-nowrap">
+                      <td className="px-3 py-2.5 whitespace-nowrap font-sans">{item.material.name}</td>
+                      <td className="px-3 py-2.5 text-right whitespace-nowrap font-mono">{item.qty_system}</td>
+                      <td className="px-3 py-2.5 text-right whitespace-nowrap">
                         {isEditable ? (
                           <input
                             type="number"
                             step="0.01"
                             value={qtyActual[item.id] ?? ''}
-                            onChange={(e) =>
-                              setQtyActual((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))
-                            }
-                            className="w-24 px-2 py-1 border border-gray-300 rounded-md text-sm text-right"
+                            onChange={(e) => setQtyActual((prev) => ({ ...prev, [item.id]: Number(e.target.value) }))}
+                            className="w-24 px-2 py-1 bg-latte/50 border border-espresso/12 rounded-lg text-sm text-right font-mono focus:outline-none focus:ring-2 focus:ring-caramel/40"
                           />
                         ) : (
-                          item.qty_actual
+                          <span className="font-mono">{item.qty_actual}</span>
                         )}
                       </td>
-                      <td
-                        className={`px-3 py-2 text-right whitespace-nowrap font-medium ${
-                          difference > 0 ? 'text-green-600' : difference < 0 ? 'text-red-600' : 'text-gray-400'
-                        }`}
-                      >
+                      <td className={`px-3 py-2.5 text-right whitespace-nowrap font-mono font-medium ${
+                        difference > 0 ? 'text-moss' : difference < 0 ? 'text-clay' : 'text-espresso/30'
+                      }`}>
                         {difference > 0 ? '+' : ''}{difference}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-2.5">
                         {isEditable ? (
                           <input
                             type="text"
                             value={notes[item.id] ?? ''}
                             onChange={(e) => setNotes((prev) => ({ ...prev, [item.id]: e.target.value }))}
                             placeholder="Opsional"
-                            className="w-full min-w-[140px] px-2 py-1 border border-gray-300 rounded-md text-sm"
+                            className="w-full min-w-[140px] px-2 py-1 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
                           />
                         ) : (
-                          item.notes ?? '-'
+                          <span className="text-espresso/60">{item.notes ?? '-'}</span>
                         )}
                       </td>
                     </tr>

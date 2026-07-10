@@ -1,1 +1,70 @@
 @import "tailwindcss";
+
+@import "@fontsource-variable/fraunces";
+@import "@fontsource-variable/manrope";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+
+@theme {
+  /* ===== Warna — nuansa kopi ===== */
+  --color-espresso: #2a1810;
+  --color-roast: #3d2318;
+  --color-roast-light: #4f2f21;
+  --color-caramel: #b4703a;
+  --color-caramel-dark: #96592c;
+  --color-latte: #f5ede1;
+  --color-cream: #fffbf5;
+  --color-moss: #6b7a4f;
+  --color-moss-light: #eef1e8;
+  --color-clay: #b5502f;
+  --color-clay-light: #fbeae5;
+  --color-honey: #c98a2c;
+  --color-honey-light: #faf1e0;
+
+  /* ===== Font ===== */
+  --font-display: "Fraunces Variable", ui-serif, serif;
+  --font-sans: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ===== Animasi ===== */
+  --ease-warm: cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-latte);
+    color: var(--color-espresso);
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+  }
+}
+
+/* ===== Animasi reusable ===== */
+@keyframes fade-slide-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.animate-page-in {
+  animation: fade-slide-in 0.35s var(--ease-warm) both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #ede2d3 25%, #f5ede1 50%, #ede2d3 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+
+/* Scrollbar tipis bernuansa kopi, bukan default browser */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4c3ac; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #c2ac8c; }

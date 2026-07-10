@@ -5,6 +5,8 @@ import { toast } from 'sonner';
 import DataTable from '../../../components/common/DataTable';
 import Modal from '../../../components/common/Modal';
 import Pagination from '../../../components/common/Pagination';
+import Button from '../../../components/common/Button';
+import PageHeader from '../../../components/common/PageHeader';
 import { materialApi } from '../../../api/masterData.api';
 import type { Material } from '../../../types/masterData';
 import MaterialForm from './MaterialForm';
@@ -18,8 +20,7 @@ export default function MaterialPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['materials', page, search],
-    queryFn: () =>
-      materialApi.list({ page, search, per_page: 10 }).then((res) => res.data),
+    queryFn: () => materialApi.list({ page, search, per_page: 10 }).then((res) => res.data),
   });
 
   const deleteMutation = useMutation({
@@ -54,25 +55,21 @@ export default function MaterialPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Material</h1>
-        <button
-          onClick={handleAdd}
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700"
-        >
-          <Plus size={16} /> Tambah Material
-        </button>
-      </div>
+      <PageHeader
+        title="Material"
+        actions={
+          <Button onClick={handleAdd} className="flex items-center gap-2">
+            <Plus size={16} /> Tambah Material
+          </Button>
+        }
+      />
 
       <input
         type="text"
         placeholder="Cari material..."
         value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setPage(1);
-        }}
-        className="w-full max-w-sm mb-4 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+        className="w-full sm:max-w-sm mb-4 px-3.5 py-2.5 bg-cream border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
       />
 
       <DataTable<Material>
@@ -80,22 +77,22 @@ export default function MaterialPage() {
         data={data?.data ?? []}
         columns={[
           { header: 'SKU', accessor: (row) => row.sku },
-          { header: 'Nama', accessor: (row) => row.name },
-          { header: 'Kategori', accessor: (row) => row.category?.name ?? '-' },
+          { header: 'Nama', accessor: (row) => row.name, className: 'font-sans' },
+          { header: 'Kategori', accessor: (row) => row.category?.name ?? '-', className: 'font-sans' },
           { header: 'Satuan', accessor: (row) => row.unit?.symbol ?? '-' },
           { header: 'Min. Stok', accessor: (row) => `${row.min_stock} ${row.unit?.symbol ?? ''}` },
           {
             header: 'Perishable',
-            accessor: (row) => (row.is_perishable ? 'Ya' : 'Tidak'),
+            accessor: (row) => (
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_perishable ? 'bg-honey-light text-honey' : 'bg-espresso/8 text-espresso/40'}`}>
+                {row.is_perishable ? 'Ya' : 'Tidak'}
+              </span>
+            ),
           },
           {
             header: 'Status',
             accessor: (row) => (
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  row.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                }`}
-              >
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_active ? 'bg-moss-light text-moss' : 'bg-espresso/8 text-espresso/40'}`}>
                 {row.is_active ? 'Aktif' : 'Nonaktif'}
               </span>
             ),
@@ -103,11 +100,11 @@ export default function MaterialPage() {
           {
             header: 'Aksi',
             accessor: (row) => (
-              <div className="flex gap-2">
-                <button onClick={() => handleEdit(row)} className="text-blue-600 hover:text-blue-800">
+              <div className="flex gap-3">
+                <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
                   <Pencil size={16} />
                 </button>
-                <button onClick={() => handleDelete(row)} className="text-red-600 hover:text-red-800">
+                <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -122,11 +119,7 @@ export default function MaterialPage() {
         onPageChange={setPage}
       />
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingMaterial ? 'Edit Material' : 'Tambah Material'}
-      >
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingMaterial ? 'Edit Material' : 'Tambah Material'}>
         <MaterialForm material={editingMaterial} onSuccess={handleFormSuccess} />
       </Modal>
     </div>

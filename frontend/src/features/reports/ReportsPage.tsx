@@ -5,6 +5,7 @@ import { Download, FileText, RotateCcw } from 'lucide-react';
 import DataTable from '../../components/common/DataTable';
 import Pagination from '../../components/common/Pagination';
 import MultiSelectSearch from '../../components/common/MultiSelectSearch';
+import PageHeader from '../../components/common/PageHeader';
 import { reportApi } from '../../api/report.api';
 import { warehouseApi, materialApi } from '../../api/masterData.api';
 import { downloadBlob } from '../../utils/downloadBlob';
@@ -60,8 +61,7 @@ export default function ReportsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['stock-movement-report', page, filterParams],
-    queryFn: () =>
-      reportApi.getStockMovements({ page, per_page: 15, ...filterParams }).then((res) => res.data),
+    queryFn: () => reportApi.getStockMovements({ page, per_page: 15, ...filterParams }).then((res) => res.data),
   });
 
   const exportExcelMutation = useMutation({
@@ -84,32 +84,34 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Laporan Stock Movement</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={() => exportExcelMutation.mutate()}
-            disabled={exportExcelMutation.isPending}
-            className="flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-          >
-            <Download size={16} /> {exportExcelMutation.isPending ? 'Mengunduh...' : 'Excel'}
-          </button>
-          <button
-            onClick={() => exportPdfMutation.mutate()}
-            disabled={exportPdfMutation.isPending}
-            className="flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-50 disabled:opacity-50"
-          >
-            <FileText size={16} /> {exportPdfMutation.isPending ? 'Mengunduh...' : 'PDF'}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        title="Laporan Stock Movement"
+        actions={
+          <>
+            <button
+              onClick={() => exportExcelMutation.mutate()}
+              disabled={exportExcelMutation.isPending}
+              className="flex items-center gap-2 border border-espresso/15 text-espresso px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-espresso/5 disabled:opacity-50 transition"
+            >
+              <Download size={16} /> {exportExcelMutation.isPending ? 'Mengunduh...' : 'Excel'}
+            </button>
+            <button
+              onClick={() => exportPdfMutation.mutate()}
+              disabled={exportPdfMutation.isPending}
+              className="flex items-center gap-2 border border-espresso/15 text-espresso px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-espresso/5 disabled:opacity-50 transition"
+            >
+              <FileText size={16} /> {exportPdfMutation.isPending ? 'Mengunduh...' : 'PDF'}
+            </button>
+          </>
+        }
+      />
 
-      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+      <div className="bg-cream rounded-2xl border border-espresso/8 p-4 mb-4 shadow-sm shadow-espresso/[0.02]">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           <select
             value={warehouseId}
             onChange={(e) => { setWarehouseId(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
           >
             <option value="">Semua Gudang</option>
             {warehouses?.map((w) => <option key={w.id} value={w.id}>{w.name}</option>)}
@@ -125,7 +127,7 @@ export default function ReportsPage() {
           <select
             value={type}
             onChange={(e) => { setType(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
           >
             <option value="">Semua Tipe</option>
             <option value="in">Masuk</option>
@@ -137,20 +139,20 @@ export default function ReportsPage() {
             type="date"
             value={dateFrom}
             onChange={(e) => { setDateFrom(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
           />
           <input
             type="date"
             value={dateTo}
             onChange={(e) => { setDateTo(e.target.value); setPage(1); }}
-            className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            className="px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-caramel/40"
           />
         </div>
 
         {hasActiveFilter && (
           <button
             onClick={handleResetFilter}
-            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-red-600 mt-3"
+            className="flex items-center gap-1.5 text-xs text-espresso/40 hover:text-clay mt-3 transition"
           >
             <RotateCcw size={13} /> Reset semua filter
           </button>
@@ -162,18 +164,22 @@ export default function ReportsPage() {
         data={data?.data ?? []}
         columns={[
           { header: 'Tanggal', accessor: (row) => new Date(row.created_at).toLocaleString('id-ID') },
-          { header: 'Material', accessor: (row) => row.material },
-          { header: 'Gudang', accessor: (row) => row.warehouse },
+          { header: 'Material', accessor: (row) => row.material, className: 'font-sans' },
+          { header: 'Gudang', accessor: (row) => row.warehouse, className: 'font-sans' },
           {
             header: 'Tipe',
             accessor: (row) => (
-              <span className={row.type === 'in' ? 'text-green-600' : row.type === 'out' ? 'text-red-600' : 'text-yellow-600'}>
+              <span className={
+                row.type === 'in' ? 'text-moss font-medium' :
+                row.type === 'out' ? 'text-clay font-medium' :
+                'text-honey font-medium'
+              }>
                 {typeLabels[row.type]}
               </span>
             ),
           },
           { header: 'Qty', accessor: (row) => row.qty },
-          { header: 'Dibuat Oleh', accessor: (row) => row.created_by },
+          { header: 'Dibuat Oleh', accessor: (row) => row.created_by, className: 'font-sans' },
         ]}
       />
 
