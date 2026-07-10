@@ -7,6 +7,10 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\User\ChangePasswordRequest;
 use App\Http\Requests\User\UpdateProfileRequest;
 use App\Models\User;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -105,6 +109,41 @@ class AuthController extends Controller
                 'permissions' => $user->getAllPermissions()->pluck('name'),
                 'must_change_password' => $user->must_change_password,
             ],
+        ]);
+    }
+    public function forgotPassword(ForgotPasswordRequest $request)
+    {
+        Password::sendResetLink($request->only('email'));
+
+        return response()->json([
+            'message' => 'Jika email terdaftar, tautan reset password telah dikirim.',
+        ]);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request)
+    {
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => $password,
+                    'must_change_password' => false,
+                ])->save();
+
+                $user->tokens()->delete();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return response()->json([
+                'message' => 'Token reset password tidak valid atau sudah kedaluwarsa.',
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Password berhasil direset. Silakan login dengan password baru Anda.',
         ]);
     }
 }

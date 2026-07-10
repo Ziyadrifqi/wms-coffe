@@ -1,8 +1,12 @@
 <?php
 
+
 namespace App\Models;
 
 use App\Models\Concerns\HasUuid;
+use App\Notifications\ResetPasswordNotification;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -62,4 +66,9 @@ class User extends Authenticatable
         'must_change_password' => 'boolean',
         'password' => 'hashed',
     ];
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
+    }
 }
