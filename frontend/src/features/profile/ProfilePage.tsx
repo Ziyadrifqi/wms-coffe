@@ -8,7 +8,7 @@ import { AlertCircle, User, Lock } from 'lucide-react';
 import { changePassword, updateProfile } from '../../api/auth.api';
 import { useAuthStore } from '../../stores/authStore';
 import { getErrorMessage } from '../../utils/getErrorMessage';
-import { TextField } from '../../components/common/FormField';
+import { TextField, PasswordField } from '../../components/common/FormField';
 import Button from '../../components/common/Button';
 
 const profileSchema = z.object({
@@ -119,21 +119,21 @@ export default function ProfilePage() {
             </form>
           ) : (
             <form onSubmit={handleSubmitPassword((data) => passwordMutation.mutate(data))} className="space-y-4 max-w-sm">
-              <TextField
+              <PasswordField
                 label="Password Saat Ini"
-                type="password"
+                autoComplete="current-password"
                 {...registerPassword('current_password')}
                 error={passwordErrors.current_password?.message}
               />
-              <TextField
+              <PasswordField
                 label="Password Baru"
-                type="password"
+                autoComplete="new-password"
                 {...registerPassword('new_password')}
                 error={passwordErrors.new_password?.message}
               />
-              <TextField
+              <PasswordField
                 label="Konfirmasi Password Baru"
-                type="password"
+                autoComplete="new-password"
                 {...registerPassword('new_password_confirmation')}
                 error={passwordErrors.new_password_confirmation?.message}
               />

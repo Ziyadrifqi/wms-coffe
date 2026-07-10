@@ -18,6 +18,8 @@ import StockOpnameDetailPage from '../features/inventory/stock-opname/StockOpnam
 import UserPage from '../features/settings/users/UserPage';
 import ProfilePage from '../features/profile/ProfilePage';
 import ReportsPage from '../features/reports/ReportsPage';
+import ForgotPasswordPage from '../features/auth/ForgotPasswordPage';
+import ResetPasswordPage from '../features/auth/ResetPasswordPage';
 import PrivateRoute from './PrivateRoute';
 import PageTitleUpdater from '../components/common/PageTitleUpdater';
 
@@ -27,6 +29,8 @@ export default function AppRouter() {
       <PageTitleUpdater />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route element={<PrivateRoute />}>
           <Route element={<DashboardLayout />}>
@@ -53,6 +57,7 @@ export default function AppRouter() {
 
             <Route path="/settings/users" element={<UserPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            
           </Route>
         </Route>
 

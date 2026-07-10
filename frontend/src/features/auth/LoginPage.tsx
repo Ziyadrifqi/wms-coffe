@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../api/auth.api';
 import { useAuthStore } from '../../stores/authStore';
 import { getErrorMessage } from '../../utils/getErrorMessage';
@@ -26,8 +26,8 @@ export default function LoginPage() {
       setAuth(user, token);
       navigate('/dashboard');
     } catch (err: unknown) {
-  setError(getErrorMessage(err, 'Login gagal. Periksa email dan password Anda.'));
-} finally {
+      setError(getErrorMessage(err, 'Login gagal. Periksa email dan password Anda.'));
+    } finally {
       setLoading(false);
     }
   };
@@ -70,7 +70,6 @@ export default function LoginPage() {
 
       {/* Panel kiri: foto gudang */}
       <div className="hidden lg:flex lg:w-[58%] relative overflow-hidden bg-[#1c130d]">
-        {/* Ganti src ini dengan foto gudang kamu, taruh di /public/images/warehouse.jpg */}
         <img
           src="/images/warehouse.jpg"
           alt=""
@@ -81,7 +80,6 @@ export default function LoginPage() {
         <div className="crate-texture absolute inset-0" />
 
         <div className="relative z-10 flex flex-col w-full p-10">
-          {/* Ganti src ini dengan logo kamu, taruh di /public/images/logo.svg */}
           <div className="flex items-center gap-3">
             <img
               src="/images/logo.svg"
@@ -172,6 +170,15 @@ export default function LoginPage() {
                 className="w-full bg-transparent border-b-2 border-[#d9cbb0] px-1 py-2.5 text-[#2a2118] placeholder:text-[#a89c85] focus:outline-none focus:border-[#8a3324] transition-colors"
                 placeholder="••••••••"
               />
+            </div>
+
+            <div className="flex justify-end -mt-1">
+              <Link
+                to="/forgot-password"
+                className="font-plex-mono text-[11px] text-[#8a3324] hover:underline"
+              >
+                lupa kata sandi?
+              </Link>
             </div>
 
             <button

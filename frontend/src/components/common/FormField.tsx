@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 
 import type {
   InputHTMLAttributes,
@@ -6,6 +6,8 @@ import type {
   TextareaHTMLAttributes,
   ReactNode,
 } from 'react';
+
+import { Eye, EyeOff } from 'lucide-react';
 
 const baseFieldStyle =
   'w-full px-3.5 py-2.5 bg-latte/50 border border-espresso/12 rounded-lg text-sm text-espresso placeholder:text-espresso/30 focus:outline-none focus:ring-2 focus:ring-caramel/40 focus:border-caramel/40 transition';
@@ -43,6 +45,40 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
   )
 );
 TextField.displayName = 'TextField';
+
+// ===== Komponen baru: PasswordField dengan toggle show/hide =====
+interface PasswordFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+}
+
+export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
+  ({ label, error, className = '', ...props }, ref) => {
+    const [visible, setVisible] = useState(false);
+
+    return (
+      <FieldWrapper label={label} error={error}>
+        <div className="relative">
+          <input
+            ref={ref}
+            type={visible ? 'text' : 'password'}
+            className={`${baseFieldStyle} pr-10 ${className}`}
+            {...props}
+          />
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={() => setVisible((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-espresso/30 hover:text-espresso/60 transition"
+          >
+            {visible ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </FieldWrapper>
+    );
+  }
+);
+PasswordField.displayName = 'PasswordField';
 
 interface SelectFieldProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
