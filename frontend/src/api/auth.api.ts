@@ -12,6 +12,17 @@ interface UpdateProfilePayload {
   email: string;
 }
 
+interface ForgotPasswordPayload {
+  email: string;
+}
+
+interface ResetPasswordPayload {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
 export const updateProfile = (payload: UpdateProfilePayload) => {
   return axiosClient.put('/profile', payload);
 };
@@ -30,4 +41,12 @@ export const logout = () => {
 
 export const getMe = () => {
   return axiosClient.get('/me');
+};
+
+export const forgotPassword = (payload: ForgotPasswordPayload) => {
+  return axiosClient.post('/forgot-password', payload);
+};
+
+export const resetPassword = (payload: ResetPasswordPayload) => {
+  return axiosClient.post('/reset-password', payload);
 };
