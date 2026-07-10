@@ -50,12 +50,23 @@ export default function ResetPasswordPage() {
 
   if (!token || !email) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-latte px-4">
-        <div className="w-full max-w-sm bg-cream rounded-2xl shadow-xl shadow-espresso/5 border border-espresso/5 p-8 text-center">
-          <p className="text-espresso/60 text-sm mb-4">Tautan reset password tidak valid atau sudah kedaluwarsa.</p>
-          <Link to="/forgot-password" className="text-sm text-caramel hover:text-caramel-dark font-medium">
-            Minta tautan baru
-          </Link>
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#f3ead9] paper-grain font-plex px-6">
+        <div className="w-full max-w-[380px] text-center fade-up">
+          <p className="text-[#6b6355] text-sm mb-6">Tautan reset kata sandi tidak valid atau sudah kedaluwarsa.</p>
+          <div className="flex flex-col gap-3">
+            <Link
+              to="/forgot-password"
+              className="font-plex-mono text-[12px] text-[#8a3324] hover:underline"
+            >
+              Minta tautan baru →
+            </Link>
+            <Link
+              to="/login"
+              className="font-plex-mono text-[12px] text-[#a89c85] hover:text-[#8a3324]"
+            >
+              ← kembali ke halaman masuk
+            </Link>
+          </div>
         </div>
       </div>
     );
