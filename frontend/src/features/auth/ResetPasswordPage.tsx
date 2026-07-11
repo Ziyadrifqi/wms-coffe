@@ -4,17 +4,14 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { Coffee, CheckCircle2 } from 'lucide-react';
 import { resetPassword } from '../../api/auth.api';
 import { getErrorMessage } from '../../utils/getErrorMessage';
-import { PasswordField } from '../../components/common/FormField';
-import Button from '../../components/common/Button';
 
 const schema = z.object({
-  password: z.string().min(8, 'Password minimal 8 karakter'),
+  password: z.string().min(8, 'Kata sandi minimal 8 karakter'),
   password_confirmation: z.string(),
 }).refine((data) => data.password === data.password_confirmation, {
-  message: 'Konfirmasi password tidak cocok',
+  message: 'Konfirmasi kata sandi tidak cocok',
   path: ['password_confirmation'],
 });
 
@@ -24,7 +21,8 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const token = searchParams.get('token') ?? '';
   const email = searchParams.get('email') ?? '';
@@ -33,24 +31,49 @@ export default function ResetPasswordPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+  } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => resetPassword({ token, email, ...data }),
     onSuccess: () => setSuccess(true),
-    onError: (err: unknown) => setError(getErrorMessage(err)),
+    onError: (err: unknown) => setApiError(getErrorMessage(err)),
   });
 
   const onSubmit = (data: FormData) => {
-    setError('');
+    setApiError('');
     mutation.mutate(data);
   };
+
+  const sharedStyle = (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+      .font-stamp { font-family: 'Oswald', sans-serif; }
+      .font-plex { font-family: 'IBM Plex Sans', sans-serif; }
+      .font-plex-mono { font-family: 'IBM Plex Mono', monospace; }
+      .paper-grain {
+        background-image: repeating-linear-gradient(
+          0deg, rgba(60,42,26,0.025) 0px, rgba(60,42,26,0.025) 1px,
+          transparent 1px, transparent 3px
+        );
+      }
+      .stamp-mark {
+        border: 2px solid currentColor;
+        outline: 1px solid currentColor;
+        outline-offset: 3px;
+        transform: rotate(-1.5deg);
+      }
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .fade-up { animation: fadeUp 0.45s ease-out both; }
+    `}</style>
+  );
 
   if (!token || !email) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-[#f3ead9] paper-grain font-plex px-6">
+        {sharedStyle}
         <div className="w-full max-w-[380px] text-center fade-up">
           <p className="text-[#6b6355] text-sm mb-6">Tautan reset kata sandi tidak valid atau sudah kedaluwarsa.</p>
           <div className="flex flex-col gap-3">
@@ -73,58 +96,111 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-latte relative overflow-hidden px-4">
-      <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-caramel/10 blur-3xl" />
-      <div className="absolute -bottom-32 -right-16 w-96 h-96 rounded-full bg-roast/10 blur-3xl" />
+    <div className="min-h-screen w-full flex bg-[#f3ead9]">
+      {sharedStyle}
 
-      <div className="w-full max-w-sm bg-cream rounded-2xl shadow-xl shadow-espresso/5 border border-espresso/5 p-8 relative animate-page-in">
-        {success ? (
-          <div className="text-center">
-            <div className="w-12 h-12 rounded-full bg-moss-light flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 size={22} className="text-moss" />
-            </div>
-            <h1 className="font-display text-xl font-medium text-espresso mb-2">Password Berhasil Direset</h1>
-            <p className="text-espresso/50 text-sm mb-6">Silakan login dengan password baru Anda.</p>
-            <Button onClick={() => navigate('/login')} fullWidth>
-              Ke Halaman Login
-            </Button>
+      <div className="flex-1 flex items-center justify-center px-6 py-12 sm:px-10 paper-grain relative font-plex">
+        <div className="w-full max-w-[380px] fade-up">
+          <div className="flex items-center gap-2.5 mb-10">
+            <img
+              src="/images/logo.svg"
+              alt="WMS Coffee"
+              className="h-8 w-8 object-contain"
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <span className="font-stamp uppercase tracking-[0.2em] text-[#3d2b1e] text-sm">
+              WMS Coffee
+            </span>
           </div>
-        ) : (
-          <>
-            <div className="flex flex-col items-center mb-8">
-              <div className="w-12 h-12 rounded-full bg-roast flex items-center justify-center mb-4 shadow-md shadow-roast/30">
-                <Coffee size={22} className="text-latte" strokeWidth={1.75} />
-              </div>
-              <h1 className="font-display text-xl font-medium text-espresso">Buat Password Baru</h1>
-              <p className="text-espresso/50 text-sm mt-1">untuk {email}</p>
+
+          {success ? (
+            <div>
+              <span className="font-plex-mono text-[11px] tracking-widest text-[#8a3324] uppercase">
+                Berhasil
+              </span>
+              <h1 className="font-stamp text-[#2a2118] text-[28px] leading-tight uppercase tracking-wide mt-3 stamp-mark inline-block px-3 py-1">
+                Kata Sandi Diperbarui
+              </h1>
+              <p className="text-[#6b6355] text-sm mt-6">
+                Silakan masuk kembali menggunakan kata sandi baru Anda.
+              </p>
+
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full mt-8 bg-[#2a2118] text-[#f3ead9] font-stamp uppercase tracking-[0.15em] text-sm py-3.5 hover:bg-[#8a3324] transition-colors"
+              >
+                Ke Halaman Masuk →
+              </button>
             </div>
+          ) : (
+            <>
+              <div className="mb-9">
+                <span className="font-plex-mono text-[11px] tracking-widest text-[#8a3324] uppercase">
+                  Pemulihan Akses
+                </span>
+                <h1 className="font-stamp text-[#2a2118] text-[28px] leading-tight uppercase tracking-wide mt-3 stamp-mark inline-block px-3 py-1">
+                  Kata Sandi Baru
+                </h1>
+                <p className="text-[#6b6355] text-sm mt-4">untuk {email}</p>
+              </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {error && (
-                <div className="bg-clay-light text-clay text-sm px-3 py-2.5 rounded-lg border border-clay/10">
-                  {error}
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                {apiError && (
+                  <div className="font-plex-mono text-[13px] text-[#8a3324] bg-[#8a3324]/[0.06] border border-[#8a3324]/25 px-4 py-3">
+                    ⚠ {apiError}
+                  </div>
+                )}
+
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="font-plex-mono text-[11px] tracking-widest uppercase text-[#6b6355]">
+                      Kata Sandi Baru
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="font-plex-mono text-[11px] text-[#8a3324] hover:underline"
+                    >
+                      {showPassword ? 'sembunyikan' : 'tampilkan'}
+                    </button>
+                  </div>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password')}
+                    className="w-full bg-transparent border-b-2 border-[#d9cbb0] px-1 py-2.5 text-[#2a2118] placeholder:text-[#a89c85] focus:outline-none focus:border-[#8a3324] transition-colors"
+                    placeholder="••••••••"
+                  />
+                  {errors.password && (
+                    <p className="font-plex-mono text-[11px] text-[#8a3324] mt-1.5">{errors.password.message}</p>
+                  )}
                 </div>
-              )}
 
-              <PasswordField
-                label="Password Baru"
-                autoComplete="new-password"
-                {...register('password')}
-                error={errors.password?.message}
-              />
-              <PasswordField
-                label="Konfirmasi Password Baru"
-                autoComplete="new-password"
-                {...register('password_confirmation')}
-                error={errors.password_confirmation?.message}
-              />
+                <div>
+                  <label className="block font-plex-mono text-[11px] tracking-widest uppercase text-[#6b6355] mb-2">
+                    Konfirmasi Kata Sandi
+                  </label>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password_confirmation')}
+                    className="w-full bg-transparent border-b-2 border-[#d9cbb0] px-1 py-2.5 text-[#2a2118] placeholder:text-[#a89c85] focus:outline-none focus:border-[#8a3324] transition-colors"
+                    placeholder="••••••••"
+                  />
+                  {errors.password_confirmation && (
+                    <p className="font-plex-mono text-[11px] text-[#8a3324] mt-1.5">{errors.password_confirmation.message}</p>
+                  )}
+                </div>
 
-              <Button type="submit" fullWidth disabled={mutation.isPending}>
-                {mutation.isPending ? 'Menyimpan...' : 'Reset Password'}
-              </Button>
-            </form>
-          </>
-        )}
+                <button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="w-full mt-2 bg-[#2a2118] text-[#f3ead9] font-stamp uppercase tracking-[0.15em] text-sm py-3.5 hover:bg-[#8a3324] disabled:opacity-50 transition-colors"
+                >
+                  {mutation.isPending ? 'Menyimpan...' : 'Reset Kata Sandi →'}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
