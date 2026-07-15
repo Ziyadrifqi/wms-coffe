@@ -9,10 +9,13 @@ import Button from '../../../components/common/Button';
 import PageHeader from '../../../components/common/PageHeader';
 import { stockOpnameApi } from '../../../api/inventory.api';
 import type { StockOpname } from '../../../types/inventory';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default function StockOpnamePage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
+
 
   const { data, isLoading } = useQuery({
     queryKey: ['stock-opnames', page],
@@ -24,9 +27,11 @@ export default function StockOpnamePage() {
       <PageHeader
         title="Stock Opname"
         actions={
+          hasPermission('master-data.create') ? (
           <Button onClick={() => navigate('/inventory/stock-opnames/new')} className="flex items-center gap-2">
             <Plus size={16} /> Buat Opname
           </Button>
+          ) : undefined
         }
       />
 

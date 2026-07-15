@@ -8,11 +8,13 @@ import Pagination from '../../../components/common/Pagination';
 import Button from '../../../components/common/Button';
 import PageHeader from '../../../components/common/PageHeader';
 import { supplierApi } from '../../../api/masterData.api';
+import { useAuthStore } from '../../../stores/authStore';
 import type { Supplier } from '../../../types/masterData';
 import SupplierForm from './SupplierForm';
 
 export default function SupplierPage() {
   const queryClient = useQueryClient();
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,14 +55,20 @@ export default function SupplierPage() {
     queryClient.invalidateQueries({ queryKey: ['suppliers'] });
   };
 
+  const canEdit = hasPermission('master-data.edit');
+  const canDelete = hasPermission('master-data.delete');
+  const showActionColumn = canEdit || canDelete;
+
   return (
     <div>
       <PageHeader
         title="Supplier"
         actions={
-          <Button onClick={handleAdd} className="flex items-center gap-2">
-            <Plus size={16} /> Tambah Supplier
-          </Button>
+          hasPermission('master-data.create') ? (
+            <Button onClick={handleAdd} className="flex items-center gap-2">
+              <Plus size={16} /> Tambah Supplier
+            </Button>
+          ) : undefined
         }
       />
 
@@ -88,19 +96,23 @@ export default function SupplierPage() {
               </span>
             ),
           },
-          {
+          ...(showActionColumn ? [{
             header: 'Aksi',
-            accessor: (row) => (
+            accessor: (row: Supplier) => (
               <div className="flex gap-3">
-                <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
-                  <Pencil size={16} />
-                </button>
-                <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
-                  <Trash2 size={16} />
-                </button>
+                {canEdit && (
+                  <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
+                    <Pencil size={16} />
+                  </button>
+                )}
+                {canDelete && (
+                  <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
             ),
-          },
+          }] : []),
         ]}
       />
 

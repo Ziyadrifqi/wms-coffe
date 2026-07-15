@@ -8,11 +8,13 @@ import Pagination from '../../../components/common/Pagination';
 import Button from '../../../components/common/Button';
 import PageHeader from '../../../components/common/PageHeader';
 import { materialApi } from '../../../api/masterData.api';
+import { useAuthStore } from '../../../stores/authStore';
 import type { Material } from '../../../types/masterData';
 import MaterialForm from './MaterialForm';
 
 export default function MaterialPage() {
   const queryClient = useQueryClient();
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,14 +55,20 @@ export default function MaterialPage() {
     queryClient.invalidateQueries({ queryKey: ['materials'] });
   };
 
+  const canEdit = hasPermission('master-data.edit');
+  const canDelete = hasPermission('master-data.delete');
+  const showActionColumn = canEdit || canDelete;
+
   return (
     <div>
       <PageHeader
         title="Material"
         actions={
-          <Button onClick={handleAdd} className="flex items-center gap-2">
-            <Plus size={16} /> Tambah Material
-          </Button>
+          hasPermission('master-data.create') ? (
+            <Button onClick={handleAdd} className="flex items-center gap-2">
+              <Plus size={16} /> Tambah Material
+            </Button>
+          ) : undefined
         }
       />
 
@@ -82,14 +90,6 @@ export default function MaterialPage() {
           { header: 'Satuan', accessor: (row) => row.unit?.symbol ?? '-' },
           { header: 'Min. Stok', accessor: (row) => `${row.min_stock} ${row.unit?.symbol ?? ''}` },
           {
-            header: 'Perishable',
-            accessor: (row) => (
-              <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_perishable ? 'bg-honey-light text-honey' : 'bg-espresso/8 text-espresso/40'}`}>
-                {row.is_perishable ? 'Ya' : 'Tidak'}
-              </span>
-            ),
-          },
-          {
             header: 'Status',
             accessor: (row) => (
               <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${row.is_active ? 'bg-moss-light text-moss' : 'bg-espresso/8 text-espresso/40'}`}>
@@ -97,19 +97,23 @@ export default function MaterialPage() {
               </span>
             ),
           },
-          {
+          ...(showActionColumn ? [{
             header: 'Aksi',
-            accessor: (row) => (
+            accessor: (row: Material) => (
               <div className="flex gap-3">
-                <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
-                  <Pencil size={16} />
-                </button>
-                <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
-                  <Trash2 size={16} />
-                </button>
+                {canEdit && (
+                  <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
+                    <Pencil size={16} />
+                  </button>
+                )}
+                {canDelete && (
+                  <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
             ),
-          },
+          }] : []),
         ]}
       />
 

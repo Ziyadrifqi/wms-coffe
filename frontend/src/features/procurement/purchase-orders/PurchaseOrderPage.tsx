@@ -9,11 +9,13 @@ import Button from '../../../components/common/Button';
 import PageHeader from '../../../components/common/PageHeader';
 import { purchaseOrderApi } from '../../../api/procurement.api';
 import type { PurchaseOrder } from '../../../types/procurement';
+import { useAuthStore } from '../../../stores/authStore';
 
 export default function PurchaseOrderPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
+  const hasPermission = useAuthStore((state) => state.hasPermission);
 
   const { data, isLoading } = useQuery({
     queryKey: ['purchase-orders', page, status],
@@ -25,9 +27,11 @@ export default function PurchaseOrderPage() {
       <PageHeader
         title="Purchase Order"
         actions={
+          hasPermission('master-data.create') ? (
           <Button onClick={() => navigate('/procurement/purchase-orders/new')} className="flex items-center gap-2">
             <Plus size={16} /> Buat PO
           </Button>
+  ) :undefined
         }
       />
 

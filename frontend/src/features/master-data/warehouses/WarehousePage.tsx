@@ -8,11 +8,13 @@ import Pagination from '../../../components/common/Pagination';
 import Button from '../../../components/common/Button';
 import PageHeader from '../../../components/common/PageHeader';
 import { warehouseApi } from '../../../api/masterData.api';
+import { useAuthStore } from '../../../stores/authStore';
 import type { Warehouse } from '../../../types/masterData';
 import WarehouseForm from './WarehouseForm';
 
 export default function WarehousePage() {
   const queryClient = useQueryClient();
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,14 +55,20 @@ export default function WarehousePage() {
     queryClient.invalidateQueries({ queryKey: ['warehouses'] });
   };
 
+  const canEdit = hasPermission('master-data.edit');
+  const canDelete = hasPermission('master-data.delete');
+  const showActionColumn = canEdit || canDelete;
+
   return (
     <div>
       <PageHeader
         title="Warehouse"
         actions={
-          <Button onClick={handleAdd} className="flex items-center gap-2">
-            <Plus size={16} /> Tambah Warehouse
-          </Button>
+          hasPermission('master-data.create') ? (
+            <Button onClick={handleAdd} className="flex items-center gap-2">
+              <Plus size={16} /> Tambah Warehouse
+            </Button>
+          ) : undefined
         }
       />
 
@@ -87,19 +95,23 @@ export default function WarehousePage() {
               </span>
             ),
           },
-          {
+          ...(showActionColumn ? [{
             header: 'Aksi',
-            accessor: (row) => (
+            accessor: (row: Warehouse) => (
               <div className="flex gap-3">
-                <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
-                  <Pencil size={16} />
-                </button>
-                <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
-                  <Trash2 size={16} />
-                </button>
+                {canEdit && (
+                  <button onClick={() => handleEdit(row)} className="text-caramel hover:text-caramel-dark">
+                    <Pencil size={16} />
+                  </button>
+                )}
+                {canDelete && (
+                  <button onClick={() => handleDelete(row)} className="text-clay/70 hover:text-clay">
+                    <Trash2 size={16} />
+                  </button>
+                )}
               </div>
             ),
-          },
+          }] : []),
         ]}
       />
 

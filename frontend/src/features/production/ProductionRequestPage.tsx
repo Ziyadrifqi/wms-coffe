@@ -9,11 +9,13 @@ import Button from '../../components/common/Button';
 import PageHeader from '../../components/common/PageHeader';
 import { productionRequestApi } from '../../api/production.api';
 import type { ProductionRequest } from '../../types/production';
+import { useAuthStore } from '../../stores/authStore';
 
 export default function ProductionRequestPage() {
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState('');
+  const hasPermission = useAuthStore((state) => state.hasPermission);
 
   const { data, isLoading } = useQuery({
     queryKey: ['production-requests', page, status],
@@ -25,9 +27,11 @@ export default function ProductionRequestPage() {
       <PageHeader
         title="Production Request"
         actions={
+           hasPermission('master-data.create') ? (
           <Button onClick={() => navigate('/production/requests/new')} className="flex items-center gap-2">
             <Plus size={16} /> Buat Request
           </Button>
+           ) : undefined
         }
       />
 
