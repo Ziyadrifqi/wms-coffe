@@ -12,6 +12,7 @@ export interface LoginResponse {
       email: string;
       roles: string[];
       permissions: string[];
+      must_change_password: boolean;
     };
     token: string;
   };
