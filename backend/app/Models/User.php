@@ -12,6 +12,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -54,9 +55,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutTrashed()
  * @mixin \Eloquent
  */
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPasswordContract
 {
-    use HasUuid, HasApiTokens, HasRoles, Notifiable, SoftDeletes;
+    use HasUuid, HasApiTokens, HasRoles, Notifiable, SoftDeletes, CanResetPassword, HasFactory;
 
     protected $fillable = ['name', 'email', 'password', 'is_active', 'must_change_password'];
 

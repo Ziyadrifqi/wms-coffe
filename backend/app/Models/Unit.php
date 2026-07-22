@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -25,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Unit extends Model
 {
-    use HasUuid;
+    use HasUuid, HasFactory;
 
     protected $fillable = ['name', 'symbol'];
 

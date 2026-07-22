@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -33,7 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Warehouse extends Model
 {
-    use HasUuid;
+    use HasUuid, HasFactory;
 
     protected $fillable = ['code', 'name', 'address', 'is_active'];
 

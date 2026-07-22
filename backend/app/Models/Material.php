@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @property string $id
@@ -46,7 +47,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Material extends Model
 {
-    use HasUuid, SoftDeletes;
+    use HasUuid, SoftDeletes, HasFactory;
 
     protected $fillable = [
         'sku',
